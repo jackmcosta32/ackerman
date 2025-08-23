@@ -1,0 +1,22 @@
+{
+  "name": "ackerman",
+  "version": "1.0.0",
+  "description": "Ackerman is a self-hosted AI assistant designed to integrate seamlessly with various applications, helping users manage their day-to-day tasks. Ackerman can take notes during meetings, create alarms and reminders, control IoT devices, and more. The project aims to provide privacy, extensibility, and powerful automation for personal and professional productivity.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jackmcosta32/ackerman.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jackmcosta32/ackerman/issues"
+  },
+  "homepage": "https://github.com/jackmcosta32/ackerman#readme",
+  "type": "module",
+  "packageManager": "pnpm@10.13.1+sha512.37ebf1a5c7a30d5fabe0c5df44ee8da4c965ca0c5af3dbab28c3a1681b70a256218d05c81c9c0dcf767ef6b8551eb5b960042b9ed4300c59242336377e01cfad"
+}
