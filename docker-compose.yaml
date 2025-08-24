@@ -4,7 +4,7 @@ services:
   database:
     image: postgres
     hostname: database
-    container_name: flatirons-database
+    container_name: development-database
     ports:
       - '${DATABASE_PORT}:5432'
     networks:

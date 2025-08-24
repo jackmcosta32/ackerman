@@ -1,9 +1,14 @@
+import {
+  Injectable,
+  ConflictException,
+  UnauthorizedException,
+} from '@nestjs/common';
+
 import { JwtService } from '@nestjs/jwt';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'src/modules/users/users.service';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +22,7 @@ export class AuthService {
     const user = await this.usersService.findOneByEmail(signInDto.email);
 
     const hasValidPassword = await user?.validatePassword(signInDto.password, {
-      pepper: this.configService.get<string>('JWT_SECRET'),
+      pepper: this.configService.get<string>('PASSWORD_PEPPER'),
     });
 
     if (!user || !hasValidPassword) {
@@ -30,6 +35,14 @@ export class AuthService {
   }
 
   async signUp(signUpDto: SignUpDto): Promise<string> {
+    const existingUser = await this.usersService.findOneByEmail(
+      signUpDto.email,
+    );
+
+    if (existingUser) {
+      throw new ConflictException('User already exists');
+    }
+
     const user = await this.usersService.create(signUpDto);
 
     const accessToken = await this.jwtService.signAsync({ id: user.id });

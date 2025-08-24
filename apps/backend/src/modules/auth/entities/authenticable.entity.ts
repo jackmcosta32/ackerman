@@ -2,12 +2,12 @@ import bcrypt from 'bcrypt';
 
 const DEFAULT_ROUNDS = 10;
 
-interface HashPasswordOptions {
+export interface HashPasswordOptions {
   pepper?: string;
   rounds?: number;
 }
 
-interface ValidatePasswordOptions {
+export interface ValidatePasswordOptions {
   pepper?: string;
 }
 

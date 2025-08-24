@@ -6,9 +6,14 @@ import {
   DeleteDateColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+
+import {
+  Authenticable,
+  type HashPasswordOptions,
+} from 'src/modules/auth/entities/authenticable.entity';
+
 import { UserDto } from '../dto/user.dto';
 import { CreateUserDto } from '../dto/create-user.dto';
-import { Authenticable } from 'src/modules/auth/entities/authenticable.entity';
 
 @Entity()
 export class User extends Authenticable {
@@ -30,11 +35,14 @@ export class User extends Authenticable {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  static async fromDto(dto: CreateUserDto): Promise<User> {
+  static async fromDto(
+    dto: CreateUserDto,
+    options?: HashPasswordOptions,
+  ): Promise<User> {
     const user = new User();
 
     user.email = dto.email;
-    user.passwordHash = await User.hashPassword(dto.password);
+    user.passwordHash = await User.hashPassword(dto.password, options);
 
     return user;
   }
