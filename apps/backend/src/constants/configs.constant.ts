@@ -1,0 +1,29 @@
+// Application
+export const PORT = 'PORT';
+
+// Auth
+export const JWT_SECRET = 'JWT_SECRET';
+export const JWT_EXPIRES_IN = 'JWT_EXPIRES_IN';
+export const PASSWORD_SALT_ROUNDS = 'PASSWORD_SALT_ROUNDS';
+export const PASSWORD_PEPPER = 'PASSWORD_PEPPER';
+
+// Exchange Rate
+export const CURRENCY_CODE = 'CURRENCY_CODE';
+
+// Cache Service
+export const CACHE_SERVICE_PORT = 'CACHE_SERVICE_PORT';
+export const CACHE_SERVICE_HOST = 'CACHE_SERVICE_HOST';
+export const CACHE_SERVICE_PASSWORD = 'CACHE_SERVICE_PASSWORD';
+
+// Database
+export const DATABASE_PORT = 'DATABASE_PORT';
+export const DATABASE_SYNC = 'DATABASE_SYNC';
+export const DATABASE_NAME = 'DATABASE_NAME';
+export const DATABASE_HOST = 'DATABASE_HOST';
+export const DATABASE_USERNAME = 'DATABASE_USERNAME';
+export const DATABASE_PASSWORD = 'DATABASE_PASSWORD';
+
+// Admin Tool
+export const ADMIN_TOOL_PORT = 'ADMIN_TOOL_PORT';
+export const ADMIN_TOOL_USERNAME = 'ADMIN_TOOL_USERNAME';
+export const ADMIN_TOOL_PASSWORD = 'ADMIN_TOOL_PASSWORD';

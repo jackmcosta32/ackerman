@@ -1,0 +1,65 @@
+### Variables
+@apiUrl = http://localhost:3000
+
+### AUTHENTICABLE ###
+
+### POST SignUp
+POST {{apiUrl}}/products HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Product",
+    "price": 123.45,
+    "expiration": "11/22/2026"
+}
+
+### GET All Products
+GET {{apiUrl}}/products HTTP/1.1
+
+### GET Product By ID
+GET {{apiUrl}}/products/1 HTTP/1.1
+
+### PATCH Product By ID
+PATCH {{apiUrl}}/products/1 HTTP/1.1
+content-type: application/json
+
+{
+    "price": 234.56
+}
+
+### DELETE Product By ID
+DELETE {{apiUrl}}/products/1 HTTP/1.1
+
+### PRODUCT ###
+
+### POST Product
+POST {{apiUrl}}/products HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Product",
+    "price": 123.45,
+    "expiration": "11/22/2026"
+}
+
+### GET All Products
+GET {{apiUrl}}/products HTTP/1.1
+
+### GET Product By ID
+GET {{apiUrl}}/products/1 HTTP/1.1
+
+### PATCH Product By ID
+PATCH {{apiUrl}}/products/1 HTTP/1.1
+content-type: application/json
+
+{
+    "price": 234.56
+}
+
+### DELETE Product By ID
+DELETE {{apiUrl}}/products/1 HTTP/1.1
+
+### EXCHANGE RATE ###
+@baseCurrency = USD
+
+GET https://open.er-api.com/v6/latest/{{baseCurrency}} HTTP/1.1
