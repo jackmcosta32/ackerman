@@ -1,5 +1,6 @@
 // Application
 export const PORT = 'PORT';
+export const NODE_ENV = 'NODE_ENV';
 
 // Auth
 export const JWT_SECRET = 'JWT_SECRET';
