@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint": "eslint --fix"
   },
   "lint-staged": {
     "**/*": "prettier --write"

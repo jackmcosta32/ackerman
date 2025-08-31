@@ -12,9 +12,9 @@ import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import { ConfigService } from '@nestjs/config';
-import { ONE_MINUTE } from 'src/constants/time.constant';
 import { NODE_ENV } from 'src/constants/configs.constant';
 import { ACCESS_TOKEN_COOKIE } from 'src/constants/cookies.constant';
+import { ONE_MINUTE } from '@workspace/shared/constants/time.constant';
 
 @Controller('auth')
 export class AuthController {
