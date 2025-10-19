@@ -9,14 +9,14 @@
     "build": "tsc --build",
     "lint": "eslint . --max-warnings 0"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@workspace/shared": "workspace:*"
   },
   "devDependencies": {
-    "@faker-js/faker": "^10.0.0"
+    "@workspace/shared": "workspace:*"
   },
   "exports": {
-    ".": "./dist/index.js",
+    ".": "./src/index.js",
     "./mocks/*": "./src/mocks/*.js"
   }
 }

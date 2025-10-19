@@ -1,12 +1,12 @@
-import { faker, Faker } from '@faker-js/faker';
 import type { Range } from '@workspace/shared';
+import { faker, type Faker } from '@faker-js/faker';
 
 export type MockParams<Model> = Partial<{
   [Key in keyof Model]: Model[Key] | ((factory: Faker) => Model[Key]);
 }>;
 
 export abstract class BaseMocker<Model> {
-  protected factory = faker;
+  protected factory: Faker = faker;
 
   protected abstract get model(): Model;
 
