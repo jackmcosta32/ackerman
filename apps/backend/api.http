@@ -1,16 +1,26 @@
 ### Variables
 @apiUrl = http://localhost:3000
 
-### AUTHENTICABLE ###
+### AUTHENTICATABLE ###
 
 ### POST SignUp
-POST {{apiUrl}}/products HTTP/1.1
+POST {{apiUrl}}/auth/sign-up HTTP/1.1
 content-type: application/json
 
 {
-    "name": "Product",
-    "price": 123.45,
-    "expiration": "11/22/2026"
+    "provider": "local",
+    "name": "User",
+    "email": "user@example.com",
+    "password": "StrongP@ssw0rd!"
+}
+
+### POST SignIn
+POST {{apiUrl}}/auth/sign-in HTTP/1.1
+content-type: application/json
+
+{
+    "email": "user@example.com",
+    "password": "StrongP@ssw0rd!"
 }
 
 ### GET All Products
