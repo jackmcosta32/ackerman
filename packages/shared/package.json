@@ -2,29 +2,17 @@
   "name": "@workspace/shared",
   "version": "0.0.0",
   "type": "commonjs",
-  "private": true,
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "private": true,
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc --build",
     "lint": "eslint . --max-warnings 0"
   },
   "exports": {
-    ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./types/*": {
-      "require": "./dist/types/*.js",
-      "import": "./dist/types/*.js",
-      "types": "./dist/types/*.d.ts"
-    },
-    "./constants/*": {
-      "require": "./dist/constants/*.js",
-      "import": "./dist/constants/*.js",
-      "types": "./dist/constants/*.d.ts"
-    }
+    ".": "./src/index.js",
+    "./types": "./src/types/*.js",
+    "./models": "./src/models/*.js",
+    "./constants": "./src/constants/*.js"
   }
 }

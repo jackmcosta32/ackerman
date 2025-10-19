@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/constants/file.constant.ts","./src/constants/index.ts","./src/constants/time.constant.ts","./src/models/index.ts","./src/models/paginated-response.model.ts","./src/types/index.ts","./src/types/numbers.type.ts","./src/types/records.type.ts"],"version":"5.8.3"}
