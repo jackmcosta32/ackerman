@@ -48,7 +48,7 @@ export class AuthService {
     return authenticatable;
   }
 
-  async signIn(signInDto: SignInDto): Promise<string> {
+  async signIn(signInDto: SignInDto) {
     const user = await this.usersService.findOneByEmail(signInDto.email);
 
     if (!user) {
@@ -80,12 +80,37 @@ export class AuthService {
       throw new InvalidCredentialsError();
     }
 
-    const accessToken = await this.jwtService.signAsync({ id: user.id });
+    const accessToken = await this.jwtService.signAsync(
+      { id: user.id },
+      {
+        expiresIn: this.configService.getOrThrow<string>(
+          'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
+        ),
+        secret: this.configService.getOrThrow<string>(
+          'JWT_ACCESS_TOKEN_SECRET',
+        ),
+      },
+    );
 
-    return accessToken;
+    const refreshToken = await this.jwtService.signAsync(
+      { id: user.id },
+      {
+        expiresIn: this.configService.getOrThrow<string>(
+          'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
+        ),
+        secret: this.configService.getOrThrow<string>(
+          'JWT_REFRESH_TOKEN_SECRET',
+        ),
+      },
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
-  async signUp(signUpDto: SignUpDto): Promise<string> {
+  async signUp(signUpDto: SignUpDto) {
     const queryRunner = this.dataSource.createQueryRunner();
 
     try {
@@ -101,10 +126,6 @@ export class AuthService {
       });
 
       await queryRunner.commitTransaction();
-
-      const accessToken = await this.jwtService.signAsync({ id: user.id });
-
-      return accessToken;
     } catch (error) {
       await queryRunner.rollbackTransaction();
 

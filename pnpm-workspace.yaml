@@ -1,3 +1,15 @@
 packages:
-  - "apps/*"
-  - "packages/*"
+  - apps/*
+  - packages/*
+
+ignoredBuiltDependencies:
+  - '@scarf/scarf'
+  - '@swc/core'
+  - bcrypt
+  - esbuild
+  - sqlite3
+  - unrs-resolver
+
+onlyBuiltDependencies:
+  - '@nestjs/core'
+  - better-sqlite3

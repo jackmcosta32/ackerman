@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -16,6 +17,8 @@ const setupApiDocumentation = (app: INestApplication) => {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(cookieParser());
 
   app.useGlobalPipes(
     new ValidationPipe({
