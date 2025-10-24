@@ -18,6 +18,9 @@ export class User {
   @Column({ unique: true })
   email: string;
 
+  @Column()
+  name: string;
+
   @DeleteDateColumn()
   deletedAt: Date;
 
@@ -31,6 +34,7 @@ export class User {
     const user = new User();
 
     user.email = dto.email;
+    user.name = dto.name;
 
     return user;
   }

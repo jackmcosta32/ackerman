@@ -1,13 +1,20 @@
 import {
   AUTH_PROVIDER,
-  AuthenticableDto,
+  AuthenticatableDto,
   type AuthProvider,
-} from '../dto/auth.dto';
+} from '@/modules/auth/dto/auth.dto';
+
+import {
+  Column,
+  Entity,
+  OneToOne,
+  JoinColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import bcrypt from 'bcrypt';
-import { Column, Entity, ForeignKey, PrimaryGeneratedColumn } from 'typeorm';
-import { CreateAuthenticableDto } from '../dto/create-authenticable.dto';
-import { User } from 'src/modules/users/entities/user.entity';
+import { SignUpDto } from '@/modules/auth/dto/sign-up.dto';
+import { User } from '@/modules/users/entities/user.entity';
 
 const DEFAULT_ROUNDS = 10;
 
@@ -21,7 +28,7 @@ export interface ValidatePasswordOptions {
 }
 
 @Entity()
-export class Authenticable {
+export class Authenticatable {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -31,8 +38,9 @@ export class Authenticable {
   @Column({ enum: AUTH_PROVIDER, default: AUTH_PROVIDER.LOCAL })
   provider: AuthProvider;
 
-  @ForeignKey(() => User)
-  userId: string;
+  @OneToOne(() => User)
+  @JoinColumn()
+  user: User;
 
   static async hashPassword(
     plainPassword: string,
@@ -41,9 +49,7 @@ export class Authenticable {
     const { pepper, rounds = DEFAULT_ROUNDS } = options || {};
     const password = pepper ? pepper + plainPassword : plainPassword;
 
-    const salt = await bcrypt.genSalt(rounds);
-
-    return bcrypt.hash(password, salt);
+    return bcrypt.hash(password, rounds);
   }
 
   async validatePassword(
@@ -59,26 +65,27 @@ export class Authenticable {
   }
 
   static async fromDto(
-    dto: CreateAuthenticableDto,
+    user: User,
+    dto: SignUpDto,
     options?: HashPasswordOptions,
-  ): Promise<Authenticable> {
-    const authenticable = new Authenticable();
+  ): Promise<Authenticatable> {
+    const authenticatable = new Authenticatable();
 
-    authenticable.userId = dto.userId;
-    authenticable.provider = dto.provider ?? AUTH_PROVIDER.LOCAL;
+    authenticatable.user = user;
+    authenticatable.provider = dto.provider ?? AUTH_PROVIDER.LOCAL;
 
     if (dto.password) {
-      authenticable.passwordHash = await Authenticable.hashPassword(
+      authenticatable.passwordHash = await Authenticatable.hashPassword(
         dto.password,
         options,
       );
     }
 
-    return authenticable;
+    return authenticatable;
   }
 
-  toDto(): AuthenticableDto {
-    const dto = new AuthenticableDto();
+  toDto(): AuthenticatableDto {
+    const dto = new AuthenticatableDto();
 
     dto.id = this.id;
     dto.provider = this.provider;

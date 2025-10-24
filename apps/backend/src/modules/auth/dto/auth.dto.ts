@@ -8,7 +8,7 @@ export const AUTH_PROVIDER = {
 
 export type AuthProvider = Values<typeof AUTH_PROVIDER>;
 
-export class AuthenticableDto {
+export class AuthenticatableDto {
   @IsString()
   id: string;
 

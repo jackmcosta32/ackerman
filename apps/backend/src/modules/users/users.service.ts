@@ -1,10 +1,11 @@
-import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Repository, type SaveOptions } from 'typeorm';
 import { UserAlreadyExistsError } from './users.errors';
+import type { WithQueryRunner } from '@/types/typeorm.types';
 
 @Injectable()
 export class UsersService {
@@ -13,7 +14,10 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(
+    createUserDto: CreateUserDto,
+    options?: WithQueryRunner<SaveOptions>,
+  ): Promise<User> {
     const user = User.fromDto(createUserDto);
 
     const existingUser = await this.findOneByEmail(createUserDto.email);
@@ -22,9 +26,11 @@ export class UsersService {
       throw new UserAlreadyExistsError(createUserDto.email);
     }
 
-    await this.usersRepository.save(user);
+    const repository = options?.queryRunner
+      ? options.queryRunner.manager.getRepository(User)
+      : this.usersRepository;
 
-    return user;
+    return repository.save(user, options);
   }
 
   async findAll(): Promise<User[]> {
@@ -40,7 +46,9 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User | null> {
-    await this.usersRepository.update(id, updateUserDto);
+    const updateResult = await this.usersRepository.update(id, updateUserDto);
+
+    if (!updateResult.affected) return null;
 
     return this.usersRepository.findOne({ where: { id } });
   }

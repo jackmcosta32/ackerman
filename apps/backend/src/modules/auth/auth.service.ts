@@ -1,42 +1,51 @@
 import {
-  UserNotFoundError,
   InvalidCredentialsError,
-  UserNotAuthenticableByProvider,
+  UserNotAuthenticatableByProvider,
 } from './auth.errors';
 
-import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { Injectable } from '@nestjs/common';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { AUTH_PROVIDER } from './dto/auth.dto';
 import { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UsersService } from 'src/modules/users/users.service';
-import { Authenticable } from './entities/authenticable.entity';
-import { CreateAuthenticableDto } from './dto/create-authenticable.dto';
+import { User } from '@/modules/users/entities/user.entity';
+import type { WithQueryRunner } from '@/types/typeorm.types';
+import { UsersService } from '@/modules/users/users.service';
+import { Authenticatable } from './entities/authenticatable.entity';
+import { UserNotFoundError } from '@/modules/users/users.errors';
+import { DataSource, Repository, type SaveOptions } from 'typeorm';
+import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(Authenticable)
-    private readonly authRepository: Repository<Authenticable>,
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
+    @InjectRepository(Authenticatable)
+    private readonly authRepository: Repository<Authenticatable>,
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
     private readonly configService: ConfigService,
   ) {}
 
   private async create(
-    createAuthenticableDto: CreateAuthenticableDto,
-  ): Promise<Authenticable> {
-    const authenticable = await Authenticable.fromDto(createAuthenticableDto, {
+    user: User,
+    signUpDto: SignUpDto,
+    options?: WithQueryRunner<SaveOptions>,
+  ): Promise<Authenticatable> {
+    const authenticatable = await Authenticatable.fromDto(user, signUpDto, {
       rounds: this.configService.get<number>('PASSWORD_ROUNDS'),
       pepper: this.configService.get<string>('PASSWORD_PEPPER'),
     });
 
-    await this.authRepository.save(authenticable);
+    const repository = options?.queryRunner
+      ? options.queryRunner.manager.getRepository(Authenticatable)
+      : this.authRepository;
 
-    return authenticable;
+    await repository.save(authenticatable, options);
+
+    return authenticatable;
   }
 
   async signIn(signInDto: SignInDto): Promise<string> {
@@ -46,21 +55,21 @@ export class AuthService {
       throw new UserNotFoundError(signInDto.email);
     }
 
-    const authenticable = await this.authRepository.findOne({
+    const authenticatable = await this.authRepository.findOne({
       where: {
-        userId: user.id,
+        user: { id: user.id },
         provider: AUTH_PROVIDER.LOCAL,
       },
     });
 
-    if (!authenticable) {
-      throw new UserNotAuthenticableByProvider(
+    if (!authenticatable) {
+      throw new UserNotAuthenticatableByProvider(
         signInDto.email,
         AUTH_PROVIDER.LOCAL,
       );
     }
 
-    const hasValidPassword = await authenticable?.validatePassword(
+    const hasValidPassword = await authenticatable.validatePassword(
       signInDto.password,
       {
         pepper: this.configService.get<string>('PASSWORD_PEPPER'),
@@ -77,15 +86,31 @@ export class AuthService {
   }
 
   async signUp(signUpDto: SignUpDto): Promise<string> {
-    const user = await this.usersService.create(signUpDto);
+    const queryRunner = this.dataSource.createQueryRunner();
 
-    await this.create({
-      userId: user.id,
-      provider: AUTH_PROVIDER.LOCAL,
-    });
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
 
-    const accessToken = await this.jwtService.signAsync({ id: user.id });
+      const user = await this.usersService.create(signUpDto, {
+        queryRunner,
+      });
 
-    return accessToken;
+      await this.create(user, signUpDto, {
+        queryRunner,
+      });
+
+      await queryRunner.commitTransaction();
+
+      const accessToken = await this.jwtService.signAsync({ id: user.id });
+
+      return accessToken;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 }
