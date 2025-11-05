@@ -88,6 +88,8 @@ All processing and data storage are self-hosted. No user data is sent to third-p
 
 ## TO-DO
 
+- [x] Basic authentication with JWT.
+- [x] Session management with refresh and session tokens.
 - [ ] AI Assistant: Implement core natural language interface.
 - [ ] Note Taking: Integrate meeting transcription and summarization.
 - [ ] Reminders & Alarms: Add scheduling and notification system.

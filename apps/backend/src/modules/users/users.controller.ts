@@ -12,7 +12,7 @@ export class UsersController {
   @Get('profile')
   async profile(@Req() req: AuthenticatedRequest) {
     const id = req.user.id;
-    const user = await this.usersService.findOne(id);
+    const user = await this.usersService.findOneById(id);
 
     return user?.toDto();
   }

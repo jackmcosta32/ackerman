@@ -1,5 +1,6 @@
 import {
   InvalidCredentialsError,
+  InvalidRefreshTokenError,
   UserNotAuthenticatableByProvider,
 } from './auth.errors';
 
@@ -16,6 +17,7 @@ import { Authenticatable } from './entities/authenticatable.entity';
 import { UserNotFoundError } from '@/modules/users/users.errors';
 import { DataSource, Repository, type SaveOptions } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+import { AuthPayload } from '@/interfaces/auth.interface';
 
 @Injectable()
 export class AuthService {
@@ -46,6 +48,37 @@ export class AuthService {
     await repository.save(authenticatable, options);
 
     return authenticatable;
+  }
+
+  private async getSessionTokens(userId: string) {
+    const accessToken = await this.jwtService.signAsync(
+      { id: userId },
+      {
+        expiresIn: this.configService.getOrThrow<string>(
+          'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
+        ),
+        secret: this.configService.getOrThrow<string>(
+          'JWT_ACCESS_TOKEN_SECRET',
+        ),
+      },
+    );
+
+    const refreshToken = await this.jwtService.signAsync(
+      { id: userId },
+      {
+        expiresIn: this.configService.getOrThrow<string>(
+          'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
+        ),
+        secret: this.configService.getOrThrow<string>(
+          'JWT_REFRESH_TOKEN_SECRET',
+        ),
+      },
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
   async signIn(signInDto: SignInDto) {
@@ -80,34 +113,7 @@ export class AuthService {
       throw new InvalidCredentialsError();
     }
 
-    const accessToken = await this.jwtService.signAsync(
-      { id: user.id },
-      {
-        expiresIn: this.configService.getOrThrow<string>(
-          'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
-        ),
-        secret: this.configService.getOrThrow<string>(
-          'JWT_ACCESS_TOKEN_SECRET',
-        ),
-      },
-    );
-
-    const refreshToken = await this.jwtService.signAsync(
-      { id: user.id },
-      {
-        expiresIn: this.configService.getOrThrow<string>(
-          'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
-        ),
-        secret: this.configService.getOrThrow<string>(
-          'JWT_REFRESH_TOKEN_SECRET',
-        ),
-      },
-    );
-
-    return {
-      accessToken,
-      refreshToken,
-    };
+    return this.getSessionTokens(user.id);
   }
 
   async signUp(signUpDto: SignUpDto) {
@@ -133,5 +139,21 @@ export class AuthService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async refresh(refreshToken: string) {
+    const payload = this.jwtService.decode<AuthPayload>(refreshToken);
+
+    if (!payload) {
+      throw new InvalidRefreshTokenError();
+    }
+
+    const user = await this.usersService.findOneById(payload.id);
+
+    if (!user) {
+      throw new UserNotFoundError(payload.id);
+    }
+
+    return this.getSessionTokens(user.id);
   }
 }

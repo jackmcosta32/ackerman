@@ -11,3 +11,9 @@ export class InvalidCredentialsError extends Error {
     super('Invalid credentials');
   }
 }
+
+export class InvalidRefreshTokenError extends Error {
+  constructor() {
+    super('Invalid refresh token');
+  }
+}
