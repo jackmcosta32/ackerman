@@ -1,0 +1,38 @@
+import {
+  Outlet,
+  ScrollRestoration,
+  createBrowserRouter,
+  type RouteObject,
+} from 'react-router';
+
+import * as PATHS from '@/constants/paths';
+import { HomeScreen } from '@/views/home';
+import { SignInScreen } from '@/views/sign-in';
+import { SignUpScreen } from '@/views/sign-up';
+
+const ROUTING_CONFIG: RouteObject[] = [
+  {
+    element: (
+      <>
+        <ScrollRestoration />
+        <Outlet />
+      </>
+    ),
+    children: [
+      {
+        path: PATHS.HOME_PATH,
+        element: <HomeScreen />,
+      },
+      {
+        path: PATHS.SIGN_IN_PATH,
+        element: <SignInScreen />,
+      },
+      {
+        path: PATHS.SIGN_UP_PATH,
+        element: <SignUpScreen />,
+      },
+    ],
+  },
+];
+
+export const router = createBrowserRouter(ROUTING_CONFIG);
