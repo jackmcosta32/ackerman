@@ -9,6 +9,7 @@ import * as PATHS from '@/constants/paths';
 import { HomeScreen } from '@/views/home';
 import { SignInScreen } from '@/views/sign-in';
 import { SignUpScreen } from '@/views/sign-up';
+import { AuthGuard } from '@/features/authentication/components/auth-guard.component';
 
 const ROUTING_CONFIG: RouteObject[] = [
   {
@@ -19,10 +20,7 @@ const ROUTING_CONFIG: RouteObject[] = [
       </>
     ),
     children: [
-      {
-        path: PATHS.HOME_PATH,
-        element: <HomeScreen />,
-      },
+      // Public routes
       {
         path: PATHS.SIGN_IN_PATH,
         element: <SignInScreen />,
@@ -30,6 +28,20 @@ const ROUTING_CONFIG: RouteObject[] = [
       {
         path: PATHS.SIGN_UP_PATH,
         element: <SignUpScreen />,
+      },
+      // Protected routes
+      {
+        element: (
+          <AuthGuard>
+            <Outlet />
+          </AuthGuard>
+        ),
+        children: [
+          {
+            path: PATHS.HOME_PATH,
+            element: <HomeScreen />,
+          },
+        ],
       },
     ],
   },
