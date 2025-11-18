@@ -7,9 +7,9 @@ import {
 
 import * as PATHS from '@/constants/paths';
 import { HomeScreen } from '@/views/home';
-import { SignInScreen } from '@/views/sign-in';
-import { SignUpScreen } from '@/views/sign-up';
-import { AuthGuard } from '@/features/authentication/components/auth-guard.component';
+import { SignInScreen } from '@/features/authentication/views/sign-in';
+import { SignUpScreen } from '@/features/authentication/views/sign-up';
+import { AuthGuard } from '@/features/authentication/components/auth-guard';
 
 const ROUTING_CONFIG: RouteObject[] = [
   {

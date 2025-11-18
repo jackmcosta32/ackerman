@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { SIGN_IN_PATH } from '@/constants/paths';
-import { useProfile } from '@/features/authentication/hooks/use-profile.hook';
+import { useProfile } from '@/features/authentication/hooks/use-profile';
 
 export interface AuthGuardProps {
   children: React.ReactNode;

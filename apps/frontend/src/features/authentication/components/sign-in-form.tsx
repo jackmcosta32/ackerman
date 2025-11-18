@@ -1,0 +1,49 @@
+import {
+  DataForm,
+  type DataFormProps,
+} from '@/features/shared/components/form/data-form';
+
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { Button } from '@/features/shared/ui/button';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { TextField } from '@/features/shared/components/form/text-field';
+import { PasswordField } from '@/features/shared/components/form/password-field';
+
+const schema = z.object({
+  email: z.email(),
+  password: z.string(),
+});
+
+export type SignInFormValues = z.infer<typeof schema>;
+
+export interface SignInFormProps
+  extends Omit<DataFormProps<SignInFormValues>, 'form'> {
+  isLoading?: boolean;
+}
+
+export const SignInForm = ({ isLoading, ...rest }: SignInFormProps) => {
+  const form = useForm({
+    mode: 'onChange',
+    resolver: zodResolver(schema),
+  });
+
+  return (
+    <DataForm form={form} {...rest}>
+      <TextField label="E-mail" name="email" />
+      <PasswordField label="Password" name="password" />
+
+      <Button type="submit" loading={isLoading}>
+        Login
+      </Button>
+
+      <Button variant="outline" type="button" disabled={isLoading}>
+        Forgot your password?
+      </Button>
+
+      <Button variant="ghost" type="button" disabled={isLoading}>
+        Don't have an account? <span className="underline">Sign up</span>
+      </Button>
+    </DataForm>
+  );
+};
