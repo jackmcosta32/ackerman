@@ -45,7 +45,7 @@ const FormField = <
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
-  const { getFieldState } = useFormContext();
+  const { getFieldState, control } = useFormContext();
   const formState = useFormState({ name: fieldContext.name });
   const fieldState = getFieldState(fieldContext.name, formState);
 
@@ -57,6 +57,7 @@ const useFormField = () => {
 
   return {
     id,
+    control,
     name: fieldContext.name,
     formItemId: `${id}-form-item`,
     formDescriptionId: `${id}-form-item-description`,
@@ -105,8 +106,11 @@ function FormLabel({
 }
 
 function FormControl({ ...props }: React.ComponentProps<typeof Slot>) {
-  const { error, formItemId, formDescriptionId, formMessageId } =
+  const { error, isTouched, formItemId, formDescriptionId, formMessageId } =
     useFormField();
+
+  const isInvalid = !!error;
+  const isValid = isTouched && !error;
 
   return (
     <Slot
@@ -117,7 +121,9 @@ function FormControl({ ...props }: React.ComponentProps<typeof Slot>) {
           ? `${formDescriptionId}`
           : `${formDescriptionId} ${formMessageId}`
       }
-      aria-invalid={!!error}
+      aria-invalid={isInvalid}
+      data-invalid={isInvalid}
+      data-valid={isValid}
       {...props}
     />
   );
