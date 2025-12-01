@@ -18,6 +18,13 @@ const setupApiDocumentation = (app: INestApplication) => {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  if (process.env.NODE_ENV !== 'production') {
+    app.enableCors({
+      origin: true,
+      credentials: true,
+    });
+  }
+
   app.use(cookieParser());
 
   app.useGlobalPipes(

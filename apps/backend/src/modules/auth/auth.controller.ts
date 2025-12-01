@@ -12,11 +12,6 @@ import {
 } from '@nestjs/common';
 
 import {
-  InvalidCredentialsError,
-  UserNotAuthenticatableByProvider,
-} from './auth.errors';
-
-import {
   ACCESS_TOKEN_COOKIE,
   REFRESH_TOKEN_COOKIE,
 } from '@/constants/cookies.constant';
@@ -42,8 +37,11 @@ export class AuthController {
       const { accessToken, refreshToken } =
         await this.authService.signIn(signInDto);
 
+      const secure =
+        this.configService.get<string>('NODE_ENV') === 'production';
+
       res.cookie(ACCESS_TOKEN_COOKIE, accessToken, {
-        secure: true,
+        secure,
         httpOnly: true,
         sameSite: 'strict',
         maxAge: this.configService.getOrThrow<number>(
@@ -52,7 +50,7 @@ export class AuthController {
       });
 
       res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, {
-        secure: true,
+        secure,
         httpOnly: true,
         sameSite: 'strict',
         path: '/auth/refresh',
@@ -65,18 +63,8 @@ export class AuthController {
         accessToken,
         refreshToken,
       });
-    } catch (error) {
-      if (error instanceof InvalidCredentialsError) {
-        throw new UnauthorizedException('Invalid credentials');
-      }
-
-      if (error instanceof UserNotAuthenticatableByProvider) {
-        throw new UnauthorizedException(
-          'No linked account found for this provider',
-        );
-      }
-
-      throw error;
+    } catch {
+      throw new UnauthorizedException();
     }
   }
 

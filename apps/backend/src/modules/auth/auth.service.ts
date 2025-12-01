@@ -13,11 +13,11 @@ import { ConfigService } from '@nestjs/config';
 import { User } from '@/modules/users/entities/user.entity';
 import type { WithQueryRunner } from '@/types/typeorm.types';
 import { UsersService } from '@/modules/users/users.service';
-import { Authenticatable } from './entities/authenticatable.entity';
+import type { AuthPayload } from '@/interfaces/auth.interface';
 import { UserNotFoundError } from '@/modules/users/users.errors';
 import { DataSource, Repository, type SaveOptions } from 'typeorm';
+import { Authenticatable } from './entities/authenticatable.entity';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
-import { AuthPayload } from '@/interfaces/auth.interface';
 
 @Injectable()
 export class AuthService {

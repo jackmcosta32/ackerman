@@ -90,6 +90,7 @@ All processing and data storage are self-hosted. No user data is sent to third-p
 
 - [x] Basic authentication with JWT.
 - [x] Session management with refresh and session tokens.
+- [ ] E-mail templates for account confirmation and recovery.
 - [ ] AI Assistant: Implement core natural language interface.
 - [ ] Note Taking: Integrate meeting transcription and summarization.
 - [ ] Reminders & Alarms: Add scheduling and notification system.
@@ -97,7 +98,9 @@ All processing and data storage are self-hosted. No user data is sent to third-p
 - [ ] Application Integrations: Calendar, email, and productivity tools.
 - [ ] Extensibility: Plugin/module system for new features.
 - [ ] Logging: Add structured logging with OpenTelemetry.
-- [ ] Desktop App: Package with Tauri for cross-platform support.
+- [x] Desktop App: Package with Tauri for cross-platform support.
+- [x] Frontend logic for sign in and sign up flows.
+- [ ] Frontend logic for the application inbuilt chat.
 
 ## References
 

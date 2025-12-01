@@ -6,7 +6,7 @@
   "scripts": {
     "prepare": "husky",
     "lint": "eslint --fix",
-    "dev": "pnpm run --parallel --filter \"./apps/**\" dev",
+    "start:dev": "pnpm run --parallel --filter \"./apps/**\" start:dev",
     "build:packages": "pnpm run --recursive --filter \"./packages/**\" build",
     "build:apps": "pnpm run --recursive --filter \"./apps/**\" build",
     "build": "pnpm run build:packages && pnpm run build:apps",

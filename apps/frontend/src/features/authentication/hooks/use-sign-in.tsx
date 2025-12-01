@@ -9,6 +9,7 @@ export interface SignInParams {
 const signIn = async (params: SignInParams) => {
   await httpApiClient.request('/auth/sign-in', {
     method: 'POST',
+    credentials: 'include',
     body: JSON.stringify(params),
   });
 };

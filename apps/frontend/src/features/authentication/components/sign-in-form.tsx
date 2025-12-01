@@ -5,10 +5,12 @@ import {
 
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
+import { Link } from '@/features/shared/ui/link';
 import { Button } from '@/features/shared/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TextField } from '@/features/shared/components/form/text-field';
 import { PasswordField } from '@/features/shared/components/form/password-field';
+import { SIGN_UP_PATH } from '@/constants/paths';
 
 const schema = z.object({
   email: z.email(),
@@ -30,8 +32,13 @@ export const SignInForm = ({ isLoading, ...rest }: SignInFormProps) => {
 
   return (
     <DataForm form={form} {...rest}>
-      <TextField label="E-mail" name="email" />
-      <PasswordField label="Password" name="password" />
+      <TextField label="E-mail" name="email" autoComplete="username" />
+
+      <PasswordField
+        label="Password"
+        name="password"
+        autoComplete="current-password"
+      />
 
       <Button type="submit" loading={isLoading}>
         Login
@@ -41,9 +48,9 @@ export const SignInForm = ({ isLoading, ...rest }: SignInFormProps) => {
         Forgot your password?
       </Button>
 
-      <Button variant="ghost" type="button" disabled={isLoading}>
+      <Link to={SIGN_UP_PATH}>
         Don't have an account? <span className="underline">Sign up</span>
-      </Button>
+      </Link>
     </DataForm>
   );
 };
