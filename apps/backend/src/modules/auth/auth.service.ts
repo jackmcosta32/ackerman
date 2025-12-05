@@ -54,7 +54,7 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync(
       { id: userId },
       {
-        expiresIn: this.configService.getOrThrow<string>(
+        expiresIn: this.configService.getOrThrow<number>(
           'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
         ),
         secret: this.configService.getOrThrow<string>(
@@ -66,7 +66,7 @@ export class AuthService {
     const refreshToken = await this.jwtService.signAsync(
       { id: userId },
       {
-        expiresIn: this.configService.getOrThrow<string>(
+        expiresIn: this.configService.getOrThrow<number>(
           'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
         ),
         secret: this.configService.getOrThrow<string>(
