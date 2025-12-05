@@ -63,7 +63,7 @@ export const SignUpForm = ({ isLoading, ...rest }: SignUpFormProps) => {
         Forgot your password?
       </Button>
 
-      <Link to={SIGN_IN_PATH}>
+      <Link to={SIGN_IN_PATH} className="text-muted-foreground">
         Already have an account? <span className="underline">Sign in</span>
       </Link>
     </DataForm>
