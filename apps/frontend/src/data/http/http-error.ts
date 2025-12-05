@@ -2,13 +2,13 @@ import type { HttpStatus } from './http-protocol';
 
 export class HttpError extends Error {
   public status: HttpStatus;
-  public response?: Response;
+  public response: Response;
   public request: RequestInit;
 
   constructor(params: {
     message?: string;
     status: HttpStatus;
-    response?: Response;
+    response: Response;
     request: RequestInit;
   }) {
     super(params.message);
