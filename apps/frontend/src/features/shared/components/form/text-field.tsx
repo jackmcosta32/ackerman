@@ -43,7 +43,7 @@ export const TextField = ({
           <FormControl>
             <Input
               {...rest}
-              value={field.value}
+              value={field.value ?? ''}
               onChange={field.onChange}
               placeholder={placeholder}
               data-hide-status={hideStatus}

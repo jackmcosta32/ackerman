@@ -100,6 +100,11 @@ All processing and data storage are self-hosted. No user data is sent to third-p
 - [ ] Logging: Add structured logging with OpenTelemetry.
 - [x] Desktop App: Package with Tauri for cross-platform support.
 - [x] Frontend logic for sign in and sign up flows.
+- [ ] Enhance validation error responses.
+- [ ] Implement a response model that supports both generic and validation error messages
+- [ ] Update the api's to return validation errors when necessary
+- [ ] Update the form component onValid method to receive either undefined or an error object/string as a result
+- [ ] Update the form component logic to apply the validation errors resultant from the onValid method to their respective input fields.
 - [ ] Frontend logic for the application inbuilt chat.
 
 ## References

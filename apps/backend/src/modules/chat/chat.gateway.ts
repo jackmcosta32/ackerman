@@ -8,7 +8,10 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 
+import crypto from 'node:crypto';
 import { Server, Socket } from 'socket.io';
+import { ChatMessageDto } from './dto/chat.dto';
+import type { ChatMessage } from './chat.interface';
 
 @WebSocketGateway({
   cors: {
@@ -29,25 +32,40 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('send_message')
   handleMessage(
-    @MessageBody() payload: { roomId: string; message: string },
+    @MessageBody() chatMessageDto: ChatMessageDto,
     @ConnectedSocket() socket: Socket,
   ) {
-    console.log('Message received:', payload);
+    console.log('Message received:', chatMessageDto);
+
+    const message: ChatMessage = {
+      id: crypto.randomUUID(),
+      senderId: socket.id,
+      roomId: chatMessageDto.roomId,
+      content: chatMessageDto.content,
+      timestamp: Date.now(),
+    };
 
     // Broadcast message to all users in the same room
-    this.server.to(payload.roomId).emit('new_message', {
-      senderId: socket.id,
-      message: payload.message,
-      timestamp: Date.now(),
-    });
+    this.server.to(chatMessageDto.roomId).emit('new_message', message);
+
+    return message;
   }
 
   @SubscribeMessage('join_room')
-  handleJoinRoom(
+  async handleJoinRoom(
     @MessageBody() roomId: string,
     @ConnectedSocket() socket: Socket,
   ) {
-    socket.join(roomId);
     console.log(`Socket ${socket.id} joined room ${roomId}`);
+    await socket.join(roomId);
+  }
+
+  @SubscribeMessage('leave_room')
+  async handleLeaveRoom(
+    @MessageBody() roomId: string,
+    @ConnectedSocket() socket: Socket,
+  ) {
+    console.log(`Socket ${socket.id} left room ${roomId}`);
+    await socket.leave(roomId);
   }
 }

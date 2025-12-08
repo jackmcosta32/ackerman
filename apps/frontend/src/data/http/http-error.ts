@@ -1,14 +1,15 @@
-import type { HttpStatus } from './http-protocol';
+import type { ErrorResponse } from '@workspace/shared';
+import type { HttpStatus, HttpResponse } from './http-protocol';
 
-export class HttpError extends Error {
+export class HttpError<TData = ErrorResponse> extends Error {
   public status: HttpStatus;
-  public response: Response;
+  public response: HttpResponse<TData>;
   public request: RequestInit;
 
   constructor(params: {
     message?: string;
     status: HttpStatus;
-    response: Response;
+    response: HttpResponse<TData>;
     request: RequestInit;
   }) {
     super(params.message);

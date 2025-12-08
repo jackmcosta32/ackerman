@@ -55,7 +55,11 @@ export const SignUpForm = ({ isLoading, ...rest }: SignUpFormProps) => {
         autoComplete="new-password"
       />
 
-      <Button type="submit" loading={isLoading}>
+      <Button
+        type="submit"
+        loading={isLoading}
+        disabled={!form.formState.isValid}
+      >
         Sign Up
       </Button>
 

@@ -1,11 +1,12 @@
 import {
   HTTP_STATUS,
-  HttpResponse,
   type HttpClient,
   type HttpHeader,
+  type HttpResponse,
 } from './http-protocol';
 
 import { HttpError } from './http-error';
+import type { ErrorResponse } from '@workspace/shared';
 
 export interface HttpClientConstructor {
   baseUrl?: string;
@@ -30,7 +31,7 @@ export class HttpFetchClient implements HttpClient {
     return Object.fromEntries(requestHeaders.entries());
   }
 
-  async request<TData>(
+  async request<TData, TError = ErrorResponse>(
     input: string | URL,
     init?: RequestInit,
   ): Promise<HttpResponse<TData>> {
@@ -43,7 +44,7 @@ export class HttpFetchClient implements HttpClient {
     const responseMessage = response.statusText;
 
     if (!response.ok) {
-      throw new HttpError({
+      throw new HttpError<TError>({
         response,
         request: requestInit,
         status: responseStatus,

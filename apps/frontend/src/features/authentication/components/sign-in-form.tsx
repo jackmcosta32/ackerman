@@ -6,11 +6,11 @@ import {
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { Link } from '@/features/shared/ui/link';
+import { SIGN_UP_PATH } from '@/constants/paths';
 import { Button } from '@/features/shared/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TextField } from '@/features/shared/components/form/text-field';
 import { PasswordField } from '@/features/shared/components/form/password-field';
-import { SIGN_UP_PATH } from '@/constants/paths';
 
 const schema = z.object({
   email: z.email(),
@@ -40,7 +40,11 @@ export const SignInForm = ({ isLoading, ...rest }: SignInFormProps) => {
         autoComplete="current-password"
       />
 
-      <Button type="submit" loading={isLoading}>
+      <Button
+        type="submit"
+        loading={isLoading}
+        disabled={!form.formState.isValid}
+      >
         Login
       </Button>
 

@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
+import { formatValidationErrors } from '@/utils/format-validation-errors';
 
 const setupApiDocumentation = (app: INestApplication) => {
   const config = new DocumentBuilder()
@@ -30,6 +31,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
+      exceptionFactory: formatValidationErrors,
     }),
   );
 

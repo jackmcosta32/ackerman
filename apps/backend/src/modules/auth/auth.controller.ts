@@ -74,7 +74,7 @@ export class AuthController {
       await this.authService.signUp(signUpDto);
     } catch (error) {
       if (error instanceof UserAlreadyExistsError) {
-        throw new ConflictException('User already exists');
+        throw new ConflictException('User with given email already exists');
       }
 
       throw error;

@@ -7,6 +7,7 @@ import {
 
 import * as PATHS from '@/constants/paths';
 import { HomeScreen } from '@/views/home';
+import { ChatScreen } from '@/features/chat/views/chat';
 import { SignInScreen } from '@/features/authentication/views/sign-in';
 import { SignUpScreen } from '@/features/authentication/views/sign-up';
 import { AuthLayout } from '@/features/authentication/layouts/auth-layout';
@@ -14,6 +15,7 @@ import { AuthGuard } from '@/features/authentication/components/auth-guard';
 
 const ROUTING_CONFIG: RouteObject[] = [
   {
+    // Public routes
     element: (
       <>
         <ScrollRestoration />
@@ -23,7 +25,6 @@ const ROUTING_CONFIG: RouteObject[] = [
       </>
     ),
     children: [
-      // Public routes
       {
         path: PATHS.SIGN_IN_PATH,
         element: <SignInScreen />,
@@ -32,19 +33,24 @@ const ROUTING_CONFIG: RouteObject[] = [
         path: PATHS.SIGN_UP_PATH,
         element: <SignUpScreen />,
       },
-      // Protected routes
+    ],
+  },
+  {
+    // Protected routes
+    element: (
+      <AuthGuard>
+        <ScrollRestoration />
+        <Outlet />
+      </AuthGuard>
+    ),
+    children: [
       {
-        element: (
-          <AuthGuard>
-            <Outlet />
-          </AuthGuard>
-        ),
-        children: [
-          {
-            path: PATHS.HOME_PATH,
-            element: <HomeScreen />,
-          },
-        ],
+        path: PATHS.HOME_PATH,
+        element: <HomeScreen />,
+      },
+      {
+        path: PATHS.CHAT_PATH,
+        element: <ChatScreen />,
       },
     ],
   },
