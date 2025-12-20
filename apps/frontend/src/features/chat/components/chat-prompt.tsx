@@ -78,6 +78,7 @@ export const ChatPrompt = ({
       <ScrollArea className="w-full flex flex-1 overflow-hidden bg-blue-500">
         <div
           dir="ltr"
+          autoFocus
           role="textbox"
           ref={inputRef}
           contentEditable
@@ -87,8 +88,8 @@ export const ChatPrompt = ({
           className="
             w-full
             max-h-40
-            whitespace-pre-wrap
             outline-none
+            whitespace-pre-wrap
             empty:before:content-[attr(data-placeholder)]
           "
         />

@@ -18,15 +18,24 @@ export const ChatHistory = ({
   const renderMessages = () => {
     if (!messages?.length) return null;
 
-    return messages.map((message) => (
-      <ChatBubble
-        key={message.id}
-        sent={message.senderId === senderId}
-        className="data-[sent=true]:ml-auto"
-      >
-        {message.content}
-      </ChatBubble>
-    ));
+    let previousSenderId: string | null = null;
+
+    return messages.map((message) => {
+      const hideTail = message.senderId === previousSenderId;
+
+      previousSenderId = message.senderId;
+
+      return (
+        <ChatBubble
+          key={message.id}
+          hideTail={hideTail}
+          sent={message.senderId === senderId}
+          className="data-[sent=true]:ml-auto"
+        >
+          {message.content}
+        </ChatBubble>
+      );
+    });
   };
 
   return (
