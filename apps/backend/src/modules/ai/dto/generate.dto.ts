@@ -11,7 +11,7 @@ import { AiModel } from '../ai.interface';
 export class GenerateDto {
   @IsOptional()
   @IsEnum(AiModel)
-  model: AiModel;
+  model?: AiModel = AiModel.DEFAULT;
 
   @IsString()
   prompt: string;

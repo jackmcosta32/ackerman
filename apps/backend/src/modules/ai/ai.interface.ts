@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 
 export enum AiModel {
-  LLAMA_3_1 = 'llama3.1:8b',
+  DEFAULT = 'llama3.1:8b',
 }
 
 export interface OllamaGenerateRequestOptions {
@@ -44,7 +44,7 @@ export interface OllamaGenerateResponse<TResponse = string> {
 }
 
 export interface AiRequest {
-  model: AiModel;
+  model?: AiModel;
   prompt: string;
   maxTokens?: number;
   temperature?: number;

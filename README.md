@@ -92,6 +92,7 @@ All processing and data storage are self-hosted. No user data is sent to third-p
 - [x] Session management with refresh and session tokens.
 - [ ] E-mail templates for account confirmation and recovery.
 - [ ] AI Assistant: Implement core natural language interface.
+- [ ] AI Assistant: Chat implementation.
 - [ ] Note Taking: Integrate meeting transcription and summarization.
 - [ ] Reminders & Alarms: Add scheduling and notification system.
 - [ ] IoT Integration: Support for common IoT protocols/devices.

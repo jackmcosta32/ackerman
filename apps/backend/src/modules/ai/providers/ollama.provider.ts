@@ -10,18 +10,23 @@ import {
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom, Observable } from 'rxjs';
-
-const OLLAMA_API_URL = 'http://localhost:11434';
+import { ConfigService } from '@nestjs/config/dist/config.service';
 
 @Injectable()
 export class OllamaAiProvider implements AiProvider {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async generate(request: AiRequest): Promise<AiResponse> {
+    const ollamaApiUrl =
+      this.configService.getOrThrow<string>('OLLAMA_API_URL');
+
     const requestObserver = this.httpService.post<
       OllamaGenerateResponse,
       OllamaGenerateRequest
-    >(`${OLLAMA_API_URL}/api/generate`, {
+    >(`${ollamaApiUrl}/api/generate`, {
       stream: false,
       prompt: request.prompt,
       model: request.model ?? AiModel.LLAMA_3_1,
@@ -37,8 +42,11 @@ export class OllamaAiProvider implements AiProvider {
   }
 
   generateStream(request: AiRequest): Observable<AiResponse> {
+    const ollamaApiUrl =
+      this.configService.getOrThrow<string>('OLLAMA_API_URL');
+
     return this.httpService.post<OllamaGenerateResponse>(
-      `${OLLAMA_API_URL}/api/generate`,
+      `${ollamaApiUrl}/api/generate`,
       {
         stream: true,
         model: request.model,
