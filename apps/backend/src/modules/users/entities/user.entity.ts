@@ -43,6 +43,7 @@ export class User {
     const dto = new UserDto();
 
     dto.id = this.id;
+    dto.name = this.name;
     dto.email = this.email;
 
     return dto;
