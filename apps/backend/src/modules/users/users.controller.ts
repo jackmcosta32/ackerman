@@ -1,7 +1,7 @@
-import { AuthGuard } from '../auth/auth.guard';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import type { AuthenticatedRequest } from 'src/interfaces/auth.interface';
+import { AuthGuard } from '@/modules/auth/auth.guard';
+import type { AuthenticatedRequest } from '@/interfaces/auth.interface';
 import { Controller, Get, Req, Body, Patch, UseGuards } from '@nestjs/common';
 
 @Controller('users')
