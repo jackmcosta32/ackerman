@@ -5,8 +5,9 @@ import {
   Post,
   Body,
   HttpCode,
-  HttpStatus,
+  UseGuards,
   Controller,
+  HttpStatus,
   ConflictException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -16,6 +17,7 @@ import {
   REFRESH_TOKEN_COOKIE,
 } from '@/constants/cookies.constant';
 
+import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
@@ -117,6 +119,7 @@ export class AuthController {
     }
   }
 
+  @UseGuards(AuthGuard)
   @Get('sign-out')
   signOut(@Res() res: Response) {
     res.clearCookie(ACCESS_TOKEN_COOKIE);
