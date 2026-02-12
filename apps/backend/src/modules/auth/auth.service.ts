@@ -5,7 +5,6 @@ import {
 } from './auth.errors';
 
 import { JwtService } from '@nestjs/jwt';
-import { Injectable } from '@nestjs/common';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { AUTH_PROVIDER } from './dto/auth.dto';
@@ -15,6 +14,7 @@ import type { WithQueryRunner } from '@/types/typeorm.types';
 import { UsersService } from '@/modules/users/users.service';
 import type { AuthPayload } from '@/interfaces/auth.interface';
 import { UserNotFoundError } from '@/modules/users/users.errors';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { DataSource, Repository, type SaveOptions } from 'typeorm';
 import { Authenticatable } from './entities/authenticatable.entity';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
@@ -79,6 +79,21 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
+  }
+
+  async validateToken(token?: string): Promise<AuthPayload> {
+    if (!token) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      const payload = await this.jwtService.verifyAsync<AuthPayload>(token, {
+        secret: this.configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
+      });
+      return payload;
+    } catch {
+      throw new UnauthorizedException();
+    }
   }
 
   async signIn(signInDto: SignInDto) {

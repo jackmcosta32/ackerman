@@ -21,8 +21,8 @@ import { DatabaseModule } from './modules/database/database.module';
     DatabaseModule,
     UsersModule,
     AuthModule,
-    ChatModule,
     AiModule,
+    ChatModule,
   ],
 })
 export class AppModule {}

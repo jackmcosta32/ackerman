@@ -29,7 +29,7 @@ export class OllamaAiProvider implements AiProvider {
     >(`${ollamaApiUrl}/api/generate`, {
       stream: false,
       prompt: request.prompt,
-      model: request.model ?? AiModel.LLAMA_3_1,
+      model: request.model ?? AiModel.DEFAULT,
     });
 
     const response = await lastValueFrom(requestObserver);
