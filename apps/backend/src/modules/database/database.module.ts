@@ -15,6 +15,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
         database: configService.getOrThrow('DATABASE_NAME'),
         username: configService.getOrThrow('DATABASE_USERNAME'),
         password: configService.getOrThrow<string>('DATABASE_PASSWORD'),
+        migrations: [__dirname + '/migrations/*.{ts,js}'],
       }),
     }),
   ],

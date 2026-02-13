@@ -1,11 +1,14 @@
 import {
   Entity,
+  Column,
   Unique,
   OneToOne,
   OneToMany,
+  JoinColumn,
   UpdateDateColumn,
   CreateDateColumn,
   DeleteDateColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 
 import { ChatRoom } from './chat-room.entity';
@@ -16,10 +19,21 @@ import { ChatParticipantDto } from '../dto/chat-participant.dto';
 @Entity()
 @Unique(['userId', 'chatRoomId'])
 export class ChatParticipant {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column('uuid')
+  userId: string;
+
+  @Column('uuid')
+  chatRoomId: string;
+
   @OneToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'userId' })
   user: User;
 
   @OneToOne(() => ChatRoom, { nullable: true })
+  @JoinColumn({ name: 'chatRoomId' })
   chatRoom: ChatRoom;
 
   @OneToOne(() => ChatMessage, { nullable: true })
