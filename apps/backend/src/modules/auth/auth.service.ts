@@ -50,9 +50,9 @@ export class AuthService {
     return authenticatable;
   }
 
-  private async getSessionTokens(userId: string) {
+  private async getSessionTokens(user: User) {
     const accessToken = await this.jwtService.signAsync(
-      { id: userId },
+      { id: user.id, role: user.role },
       {
         expiresIn: this.configService.getOrThrow<number>(
           'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
@@ -64,7 +64,7 @@ export class AuthService {
     );
 
     const refreshToken = await this.jwtService.signAsync(
-      { id: userId },
+      { id: user.id, role: user.role },
       {
         expiresIn: this.configService.getOrThrow<number>(
           'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
@@ -128,7 +128,7 @@ export class AuthService {
       throw new InvalidCredentialsError();
     }
 
-    return this.getSessionTokens(user.id);
+    return this.getSessionTokens(user);
   }
 
   async signUp(signUpDto: SignUpDto) {
@@ -157,7 +157,16 @@ export class AuthService {
   }
 
   async refresh(refreshToken: string) {
-    const payload = this.jwtService.decode<AuthPayload>(refreshToken);
+    const jwtSecret = this.configService.getOrThrow<string>(
+      'JWT_REFRESH_TOKEN_SECRET',
+    );
+
+    const payload = await this.jwtService.verifyAsync<AuthPayload>(
+      refreshToken,
+      {
+        secret: jwtSecret,
+      },
+    );
 
     if (!payload) {
       throw new InvalidRefreshTokenError();
@@ -169,6 +178,6 @@ export class AuthService {
       throw new UserNotFoundError(payload.id);
     }
 
-    return this.getSessionTokens(user.id);
+    return this.getSessionTokens(user);
   }
 }

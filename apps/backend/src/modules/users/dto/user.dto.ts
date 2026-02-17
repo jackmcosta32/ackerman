@@ -1,4 +1,5 @@
-import { IsEmail, IsString } from 'class-validator';
+import { Role } from '@/constants/roles.constant';
+import { IsEmail, IsEnum, IsString } from 'class-validator';
 
 export class UserDto {
   @IsString()
@@ -9,4 +10,7 @@ export class UserDto {
 
   @IsEmail()
   email: string;
+
+  @IsEnum(Role)
+  role: Role;
 }

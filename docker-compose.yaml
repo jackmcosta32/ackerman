@@ -4,7 +4,7 @@ services:
   database:
     image: postgres
     hostname: database
-    container_name: development-database
+    container_name: ackerman-database
     ports:
       - '${DATABASE_PORT}:5432'
     networks:
@@ -13,20 +13,6 @@ services:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-
-  database-admin-tool:
-    image: dpage/pgadmin4
-    hostname: database-admin-tool
-    container_name: flatirons-database-admin-tool
-    depends_on:
-      - database
-    ports:
-      - '${ADMIN_TOOL_PORT}:80'
-    networks:
-      - application-network
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${ADMIN_TOOL_USERNAME}
-      PGADMIN_DEFAULT_PASSWORD: ${ADMIN_TOOL_PASSWORD}
 
   ollama:
     image: ollama/ollama
@@ -37,6 +23,15 @@ services:
       - '${OLLAMA_PORT}:11434'
     volumes:
       - .volumes/ollama:/root/.ollama
+
+  cache:
+    image: redis:7-alpine
+    container_name: ackerman-cache
+    command: redis-server --requirepass ${CACHE_SERVICE_PASSWORD}
+    networks:
+      - application-network
+    ports:
+      - '${CACHE_SERVICE_PORT}:6379'
 
 networks:
   application-network:

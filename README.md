@@ -45,6 +45,11 @@ Ackerman leverages Ollama as its AI model, a Node.js backend built with NestJS f
 4. Start the backend API (NestJS).
 5. Start the frontend (Tauri + React + Vite).
 6. Access the desktop application or web interface.
+7. After running migrations, promote at least one admin user to manage flags:
+
+```sql
+UPDATE "user" SET "role" = 'ADMIN' WHERE email = 'your-admin@email.com';
+```
 
 Detailed setup instructions will be provided in the respective `backend/` and `frontend/` README files.
 
@@ -107,6 +112,7 @@ All processing and data storage are self-hosted. No user data is sent to third-p
 - [ ] Update the form component onValid method to receive either undefined or an error object/string as a result
 - [ ] Update the form component logic to apply the validation errors resultant from the onValid method to their respective input fields.
 - [ ] Frontend logic for the application inbuilt chat.
+- [x] Feature flags.
 
 ## References
 
