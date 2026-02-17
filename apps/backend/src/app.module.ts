@@ -5,6 +5,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { UsersModule } from './modules/users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ProfilesModule } from './modules/profiles/profiles.module';
 import { DatabaseModule } from './modules/database/database.module';
 import { FeatureFlagsModule } from './modules/feature-flags/feature-flags.module';
 
@@ -22,9 +23,10 @@ import { FeatureFlagsModule } from './modules/feature-flags/feature-flags.module
     DatabaseModule,
     UsersModule,
     AuthModule,
+    FeatureFlagsModule,
+    ProfilesModule,
     AiModule,
     ChatModule,
-    FeatureFlagsModule,
   ],
 })
 export class AppModule {}
