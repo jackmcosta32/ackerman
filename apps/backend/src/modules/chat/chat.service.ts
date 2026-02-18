@@ -1,19 +1,30 @@
-import { Repository } from 'typeorm';
+import type {
+  FindAllChatRoomsDataResult,
+  FindAllChatRoomsCountResult,
+} from './chat.interface';
+
+import { DataSource, Repository } from 'typeorm';
 import { AiService } from '@/modules/ai/ai.service';
+import { PaginatedResponse } from '@workspace/shared';
 import { ChatRoom } from './entities/chat-room.entity';
 import { ChatMessage } from './entities/chat-message.entity';
 import { UsersService } from '@/modules/users/users.service';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
+import { FindAllChatRoomsDto } from './dto/find-all-chat-rooms.dto';
 import { ChatParticipant } from './entities/chat-participant.entity';
 import { CreateChatMessageDto } from './dto/create-chat-message.dto';
+import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm/dist/common/typeorm.decorators';
+import { getPaginationMetadata } from '@/modules/shared/utils/pagination/get-pagination-metadata';
 
 @Injectable()
 export class ChatService {
   constructor(
     private readonly aiService: AiService,
     private readonly userService: UsersService,
+
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
 
     @InjectRepository(ChatRoom)
     private readonly chatRoomRepository: Repository<ChatRoom>,
@@ -25,12 +36,140 @@ export class ChatService {
     private readonly chatParticipantRepository: Repository<ChatParticipant>,
   ) {}
 
-  async createChatRoom(createChatRoomDto: CreateChatRoomDto) {
-    const chatRoom = ChatRoom.fromDto(createChatRoomDto);
+  async createChatRoom(userId: string, createChatRoomDto: CreateChatRoomDto) {
+    const user = await this.userService.findOneById(userId);
 
-    await this.chatRoomRepository.save(chatRoom);
+    if (!user) {
+      throw new UnprocessableEntityException(
+        `Could not find user with id ${userId}`,
+      );
+    }
 
-    return chatRoom;
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      const chatRoom = ChatRoom.fromDto(createChatRoomDto, user);
+      const chatParticipant = ChatParticipant.fromDto(user, chatRoom);
+
+      await queryRunner.manager.save(chatRoom);
+      await queryRunner.manager.save(chatParticipant);
+      await queryRunner.commitTransaction();
+
+      return chatRoom;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async findAllChatRoomsForUser(
+    userId: string,
+    findAllChatRoomsDto: FindAllChatRoomsDto,
+  ): Promise<PaginatedResponse<FindAllChatRoomsDataResult>> {
+    const { page, limit } = findAllChatRoomsDto;
+
+    const offset = page * limit;
+
+    const chatRoomDataPromise = this.dataSource.query<
+      FindAllChatRoomsDataResult[]
+    >(
+      `
+        SELECT
+          "chat_room"."id",
+          "chat_room"."name",
+          "chat_room"."private",
+          "chat_room"."createdAt",
+          "chat_room"."updatedAt",
+          (
+            SELECT COUNT(DISTINCT "cp"."id")
+            FROM "chat_participant" "cp"
+            WHERE "cp"."chatRoomId" = "chat_room"."id"
+            AND "cp"."deletedAt" IS NULL
+          )::int AS "participantCount",
+          (
+            SELECT COUNT(DISTINCT "cm"."id")
+            FROM "chat_message" "cm"
+            WHERE "cm"."chatRoomId" = "chat_room"."id"
+            AND "cm"."deletedAt" IS NULL
+          )::int AS "messageCount",
+          (
+            SELECT MAX("cm"."createdAt")
+            FROM "chat_message" "cm"
+            WHERE "cm"."chatRoomId" = "chat_room"."id"
+            AND "cm"."deletedAt" IS NULL
+          ) AS "lastMessageAt",
+          (
+            SELECT COUNT(DISTINCT "cm"."id")
+            FROM "chat_message" "cm"
+            LEFT JOIN "chat_message" "lrm"
+              ON "user_participant"."lastReadMessageId" = "lrm"."id"
+            WHERE "cm"."chatRoomId" = "chat_room"."id"
+            AND "cm"."deletedAt" IS NULL
+            AND "cm"."createdAt" > COALESCE("lrm"."createdAt", "chat_room"."createdAt")
+          )::int AS "unreadMessageCount"
+        FROM "chat_room"
+        LEFT JOIN "chat_participant" AS "user_participant"
+          ON "chat_room"."id" = "user_participant"."chatRoomId"
+          AND "user_participant"."userId" = $3
+          AND "user_participant"."deletedAt" IS NULL
+        WHERE
+          "chat_room"."deletedAt" IS NULL
+          AND (
+            "chat_room"."ownerId" = $3
+            OR "user_participant"."id" IS NOT NULL
+            OR "chat_room"."private" = false
+          )
+        ORDER BY
+          "lastMessageAt" DESC NULLS LAST,
+          "chat_room"."createdAt" DESC
+        LIMIT $1
+        OFFSET $2;
+      `,
+      [limit, offset, userId],
+    );
+
+    const chatRoomCountPromise = this.dataSource.query<
+      FindAllChatRoomsCountResult[]
+    >(
+      `
+        SELECT
+          COUNT(DISTINCT "chat_room"."id")::int AS "count"
+        FROM "chat_room"
+        LEFT JOIN "chat_participant" AS "cp"
+          ON "chat_room"."id" = "cp"."chatRoomId"
+          AND "cp"."deletedAt" IS NULL
+        WHERE
+          "chat_room"."deletedAt" IS NULL
+          AND (
+            "chat_room"."ownerId" = $1
+            OR "cp"."id" IS NOT NULL
+            OR "chat_room"."private" = false
+          );
+      `,
+      [userId],
+    );
+
+    const [chatRoomData, chatRoomCount] = await Promise.all([
+      chatRoomDataPromise,
+      chatRoomCountPromise,
+    ]);
+
+    const paginationMetadata = getPaginationMetadata({
+      currentPage: page,
+      pageSize: limit,
+      totalRecords: chatRoomCount[0].count,
+    });
+
+    return {
+      data: chatRoomData,
+      pagination: paginationMetadata,
+    };
   }
 
   async joinChatRoom(userId: string, chatRoomId: string) {
@@ -78,7 +217,7 @@ export class ChatService {
 
     if (!existingChatParticipant) return;
 
-    await this.chatParticipantRepository.remove(existingChatParticipant);
+    await this.chatParticipantRepository.softRemove(existingChatParticipant);
   }
 
   async sendMessageFromUser(

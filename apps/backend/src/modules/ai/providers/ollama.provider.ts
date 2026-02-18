@@ -9,8 +9,8 @@ import {
 
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
 import { lastValueFrom, Observable } from 'rxjs';
-import { ConfigService } from '@nestjs/config/dist/config.service';
 
 @Injectable()
 export class OllamaAiProvider implements AiProvider {

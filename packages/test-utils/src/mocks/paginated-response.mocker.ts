@@ -17,12 +17,14 @@ export class PaginatedResponseMocker<TData> extends BaseMocker<
 
     return {
       data: this.dataMocker.mockMany(quantity),
-      pageSize: limit,
-      totalPages: maxPage,
-      currentPage: page,
-      nextPage: Math.min(page + 1, maxPage),
-      previousPage: Math.max(page - 1, 1),
-      totalRecords: total,
+      pagination: {
+        pageSize: limit,
+        totalPages: maxPage,
+        currentPage: page,
+        nextPage: Math.min(page + 1, maxPage),
+        previousPage: Math.max(page - 1, 1),
+        totalRecords: total,
+      },
     };
   }
 }

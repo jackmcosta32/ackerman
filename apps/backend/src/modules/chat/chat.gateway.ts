@@ -9,11 +9,17 @@ import {
 } from '@nestjs/websockets';
 
 import { Server, Socket } from 'socket.io';
+import { UseGuards } from '@nestjs/common';
 import { ChatService } from './chat.service';
+import { AuthGuard } from '@/modules/auth/auth.guard';
 import { AuthService } from '@/modules/auth/auth.service';
+import { JoinChatRoomDto } from './dto/join-chat-room.dto';
+import { LeaveChatRoomDto } from './dto/leave-chat-room.dto';
 import { SendChatMessageDto } from './dto/send-chat-message.dto';
 import type { AuthenticatedSocket } from '@/interfaces/auth.interface';
+import { extractTokenFromWebSocket } from '@/modules/auth/strategies/jwt/jwt.utils';
 
+@UseGuards(AuthGuard)
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -32,7 +38,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`Client connected: ${socket.id}`);
 
     try {
-      const token = socket.handshake.auth.token as string;
+      const token = extractTokenFromWebSocket(socket);
 
       if (!token) {
         console.log(`No token provided for socket ${socket.id}`);
@@ -71,25 +77,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('join_room')
   async handleJoinRoom(
-    @MessageBody() roomId: string,
+    @MessageBody() joinChatRoomDto: JoinChatRoomDto,
     @ConnectedSocket() socket: AuthenticatedSocket,
   ) {
-    console.log(`Socket ${socket.id} joined room ${roomId}`);
+    console.log(
+      `Socket ${socket.id} joined room ${joinChatRoomDto.chatRoomId}`,
+    );
 
-    await this.chatService.joinChatRoom(socket.data.user.id, roomId);
+    await this.chatService.joinChatRoom(
+      socket.data.user.id,
+      joinChatRoomDto.chatRoomId,
+    );
 
-    await socket.join(roomId);
+    await socket.join(joinChatRoomDto.chatRoomId);
   }
 
   @SubscribeMessage('leave_room')
   async handleLeaveRoom(
-    @MessageBody() roomId: string,
+    @MessageBody() leaveChatRoomDto: LeaveChatRoomDto,
     @ConnectedSocket() socket: AuthenticatedSocket,
   ) {
-    console.log(`Socket ${socket.id} left room ${roomId}`);
+    console.log(`Socket ${socket.id} left room ${leaveChatRoomDto.chatRoomId}`);
 
-    await this.chatService.leaveChatRoom(socket.data.user.id, roomId);
-
-    await socket.leave(roomId);
+    await socket.leave(leaveChatRoomDto.chatRoomId);
   }
 }

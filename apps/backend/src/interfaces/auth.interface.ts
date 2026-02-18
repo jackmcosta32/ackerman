@@ -1,6 +1,6 @@
 import type { Request } from 'express';
+import type { Socket } from 'socket.io';
 import { Role } from '@/constants/roles.constant';
-import type { Socket } from 'node_modules/socket.io/dist/socket';
 
 export interface AuthPayload {
   id: string;

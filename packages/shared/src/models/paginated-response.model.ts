@@ -1,9 +1,18 @@
-export interface PaginatedResponse<TData> {
-  data: TData[];
-  pageSize: number;
-  totalPages: number;
-  currentPage: number;
+export interface PaginationMetadata {
   totalRecords: number;
-  nextPage: number | null;
+  currentPage: number;
   previousPage: number | null;
+  nextPage?: number | null;
+  totalPages: number;
+  pageSize: number;
+}
+
+export interface PaginatedRequest {
+  limit?: number;
+  page?: number;
+}
+
+export interface PaginatedResponse<TData> {
+  pagination: PaginationMetadata;
+  data: TData[];
 }

@@ -3,6 +3,7 @@ import {
   Column,
   Unique,
   OneToOne,
+  ManyToOne,
   OneToMany,
   JoinColumn,
   UpdateDateColumn,
@@ -28,7 +29,7 @@ export class ChatParticipant {
   @Column('uuid')
   chatRoomId: string;
 
-  @OneToOne(() => User, { nullable: true })
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'userId' })
   user: User;
 
@@ -37,6 +38,7 @@ export class ChatParticipant {
   chatRoom: ChatRoom;
 
   @OneToOne(() => ChatMessage, { nullable: true })
+  @JoinColumn({ name: 'lastReadMessageId' })
   lastReadMessage?: ChatMessage;
 
   @OneToMany(() => ChatMessage, (message) => message.sender)

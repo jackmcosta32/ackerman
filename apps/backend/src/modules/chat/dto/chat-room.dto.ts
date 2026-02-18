@@ -1,5 +1,5 @@
-import { IsDateString, IsString } from 'class-validator';
 import { ChatParticipantDto } from './chat-participant.dto';
+import { IsBoolean, IsDateString, IsString } from 'class-validator';
 
 export class ChatRoomDto {
   @IsString()
@@ -7,6 +7,9 @@ export class ChatRoomDto {
 
   @IsString()
   name: string;
+
+  @IsBoolean()
+  private: boolean;
 
   @IsDateString()
   createdAt: string;
