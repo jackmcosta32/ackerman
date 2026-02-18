@@ -4,7 +4,7 @@ import type { ChatMessage } from '@/features/chat/models/chat.model';
 
 export const useChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const roomIdRef = useRef<string | null>(null);
+  const chatRoomIdRef = useRef<string | null>(null);
 
   const handleOnNewMessage = useCallback((message: ChatMessage) => {
     console.log('New message received:', message);
@@ -13,30 +13,30 @@ export const useChat = () => {
   }, []);
 
   const handleLeaveRoom = () => {
-    if (!roomIdRef.current) return;
+    if (!chatRoomIdRef.current) return;
 
-    socketApiClient.emit('leave_room', roomIdRef.current);
+    socketApiClient.emit('leave_room', chatRoomIdRef.current);
 
     socketApiClient.off('new_message', handleOnNewMessage);
 
-    roomIdRef.current = null;
+    chatRoomIdRef.current = null;
   };
 
-  const handleJoinRoom = (roomId: string) => {
-    if (roomIdRef.current) handleLeaveRoom();
+  const handleJoinRoom = (chatRoomId: string) => {
+    if (chatRoomIdRef.current) handleLeaveRoom();
 
-    roomIdRef.current = roomId;
+    chatRoomIdRef.current = chatRoomId;
 
-    socketApiClient.emit('join_room', roomId);
+    socketApiClient.emit('join_room', chatRoomId);
 
     socketApiClient.on('new_message', handleOnNewMessage);
   };
 
   const handleSendMessage = (content: string) => {
-    if (!roomIdRef.current) return;
+    if (!chatRoomIdRef.current) return;
 
     socketApiClient.emit('send_message', {
-      roomId: roomIdRef.current,
+      chatRoomId: chatRoomIdRef.current,
       content,
     });
   };
