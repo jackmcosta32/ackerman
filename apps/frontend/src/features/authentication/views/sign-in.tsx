@@ -29,7 +29,11 @@ export const SignInScreen = () => {
         const errorResponse: ErrorResponse = await error.response.json();
 
         if (errorResponse.message) {
-          errorMessage = errorResponse.message;
+          if (Array.isArray(errorResponse.message)) {
+            errorMessage = errorResponse.message.join(', ');
+          } else {
+            errorMessage = errorResponse.message;
+          }
         }
       }
 
