@@ -3,9 +3,14 @@ import type {
   FindAllChatRoomsCountResult,
 } from './chat.interface';
 
+import {
+  Injectable,
+  ForbiddenException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
+
 import { DataSource, Repository } from 'typeorm';
 import { AiService } from '@/modules/ai/ai.service';
-import { PaginatedResponse } from '@workspace/shared';
 import { ChatRoom } from './entities/chat-room.entity';
 import { ChatMessage } from './entities/chat-message.entity';
 import { UsersService } from '@/modules/users/users.service';
@@ -14,7 +19,8 @@ import { FindAllChatRoomsDto } from './dto/find-all-chat-rooms.dto';
 import { ChatParticipant } from './entities/chat-participant.entity';
 import { CreateChatMessageDto } from './dto/create-chat-message.dto';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { ChatParticipantRole } from '@workspace/shared/constants/chat.constant';
+import type { PaginatedResponse } from '@workspace/shared/models/paginated-response.model';
 import { getPaginationMetadata } from '@/modules/shared/utils/pagination/get-pagination-metadata';
 
 @Injectable()
@@ -51,8 +57,11 @@ export class ChatService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      const chatRoom = ChatRoom.fromDto(createChatRoomDto, user);
-      const chatParticipant = ChatParticipant.fromDto(user, chatRoom);
+      const chatRoom = ChatRoom.fromDto(user, createChatRoomDto);
+
+      const chatParticipant = ChatParticipant.fromDto(user, chatRoom, {
+        role: ChatParticipantRole.ADMIN,
+      });
 
       await queryRunner.manager.save(chatRoom);
       await queryRunner.manager.save(chatParticipant);
@@ -195,7 +204,9 @@ export class ChatService {
       throw new UnprocessableEntityException('User not found');
     }
 
-    const newChatParticipant = ChatParticipant.fromDto(user, chatRoom);
+    const newChatParticipant = ChatParticipant.fromDto(user, chatRoom, {
+      role: ChatParticipantRole.USER,
+    });
 
     await this.chatParticipantRepository.save(newChatParticipant);
   }
@@ -220,10 +231,53 @@ export class ChatService {
     await this.chatParticipantRepository.softRemove(existingChatParticipant);
   }
 
+  async inviteUserToChatRoom(
+    userId: string,
+    invitedUserId: string,
+    chatRoomId: string,
+  ) {
+    const chatRoom = await this.chatRoomRepository.findOneBy({
+      id: chatRoomId,
+    });
+
+    if (!chatRoom) {
+      throw new UnprocessableEntityException('Chat room not found');
+    }
+
+    const chatParticipant = await this.chatParticipantRepository.findOneBy({
+      user: { id: userId },
+      chatRoom: { id: chatRoomId },
+    });
+
+    if (chatParticipant?.role !== ChatParticipantRole.ADMIN) {
+      throw new ForbiddenException('Could not invite user to chat room');
+    }
+
+    const existingInvitedParticipant =
+      await this.chatParticipantRepository.findOneBy({
+        user: { id: invitedUserId },
+        chatRoom: { id: chatRoomId },
+      });
+
+    if (existingInvitedParticipant) return;
+
+    const invitedUser = await this.userService.findOneById(invitedUserId);
+
+    if (!invitedUser) {
+      throw new UnprocessableEntityException('Invited user not found');
+    }
+
+    const invitedParticipant = ChatParticipant.fromDto(invitedUser, chatRoom, {
+      role: ChatParticipantRole.USER,
+    });
+
+    await this.chatParticipantRepository.save(invitedParticipant);
+  }
+
   async sendMessageFromUser(
     userId: string,
     chatRoomId: string,
-    message: CreateChatMessageDto,
+    createChatMessageDto: CreateChatMessageDto,
   ) {
     const chatRoom = await this.chatRoomRepository.findOneBy({
       id: chatRoomId,
@@ -242,14 +296,21 @@ export class ChatService {
       throw new UnprocessableEntityException('Sender not found');
     }
 
-    const chatMessage = ChatMessage.fromDto(message, sender, chatRoom);
+    const chatMessage = ChatMessage.fromDto(
+      sender,
+      chatRoom,
+      createChatMessageDto,
+    );
 
     await this.chatMessageRepository.save(chatMessage);
 
     return chatMessage;
   }
 
-  async sendResponseFromAI(chatRoomId: string, message: CreateChatMessageDto) {
+  async sendResponseFromAI(
+    chatRoomId: string,
+    createChatMessageDto: CreateChatMessageDto,
+  ) {
     const chatRoom = await this.chatRoomRepository.findOneBy({
       id: chatRoomId,
     });
@@ -259,7 +320,7 @@ export class ChatService {
     }
 
     const aiResponse = await this.aiService.generate({
-      prompt: message.content,
+      prompt: createChatMessageDto.content,
     });
 
     // const chatMessage = ChatMessage.fromDto(

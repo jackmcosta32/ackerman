@@ -8,8 +8,8 @@ import {
 } from 'typeorm';
 
 import { UserDto } from '../dto/user.dto';
-import { Role } from '@/constants/roles.constant';
 import { CreateUserDto } from '../dto/create-user.dto';
+import { UserRole } from '@workspace/shared/constants/user.constant';
 
 @Entity()
 export class User {
@@ -22,8 +22,8 @@ export class User {
   @Column()
   name: string;
 
-  @Column({ type: 'enum', enum: Role, default: Role.USER })
-  role: Role;
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  role: UserRole;
 
   @DeleteDateColumn()
   deletedAt: Date;

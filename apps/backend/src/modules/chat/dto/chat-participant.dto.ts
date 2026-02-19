@@ -1,4 +1,5 @@
-import { IsDateString, IsString, Length } from 'class-validator';
+import { IsDateString, IsEnum, IsString, Length } from 'class-validator';
+import { ChatParticipantRole } from '@workspace/shared/constants/chat.constant';
 
 export class ChatParticipantDto {
   @IsString()
@@ -10,4 +11,7 @@ export class ChatParticipantDto {
 
   @IsDateString()
   createdAt: string;
+
+  @IsEnum(ChatParticipantRole)
+  role: ChatParticipantRole;
 }

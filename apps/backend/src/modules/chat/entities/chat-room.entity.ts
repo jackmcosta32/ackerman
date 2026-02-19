@@ -17,6 +17,10 @@ import { User } from '@/modules/users/entities/user.entity';
 import { ChatParticipant } from './chat-participant.entity';
 import { CreateChatRoomDto } from '../dto/create-chat-room.dto';
 
+export interface CreateChatRoomFromDtoOptions {
+  participants?: ChatParticipant[];
+}
+
 @Entity()
 export class ChatRoom {
   @PrimaryGeneratedColumn('uuid')
@@ -52,15 +56,15 @@ export class ChatRoom {
   updatedAt: Date;
 
   static fromDto(
-    dto: CreateChatRoomDto,
     user: User,
-    participants: ChatParticipant[] = [],
+    dto: CreateChatRoomDto,
+    options?: CreateChatRoomFromDtoOptions,
   ): ChatRoom {
     const chatRoom = new ChatRoom();
 
     chatRoom.owner = user;
     chatRoom.name = dto.name;
-    chatRoom.participants = participants;
+    chatRoom.participants = options?.participants || [];
 
     return chatRoom;
   }

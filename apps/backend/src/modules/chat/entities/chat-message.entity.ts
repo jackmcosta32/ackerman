@@ -40,9 +40,9 @@ export class ChatMessage {
   updatedAt: Date;
 
   static fromDto(
-    dto: CreateChatMessageDto,
     sender: ChatParticipant,
     chatRoom: ChatRoom,
+    dto: CreateChatMessageDto,
   ): ChatMessage {
     const message = new ChatMessage();
 

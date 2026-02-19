@@ -16,6 +16,8 @@ import { ChatRoom } from './chat-room.entity';
 import { ChatMessage } from './chat-message.entity';
 import { User } from '@/modules/users/entities/user.entity';
 import { ChatParticipantDto } from '../dto/chat-participant.dto';
+import { ChatParticipantRole } from '@workspace/shared/constants/chat.constant';
+import { CreateChatParticipantDto } from '../dto/create-chat-participant.dto';
 
 @Entity()
 @Unique(['userId', 'chatRoomId'])
@@ -44,6 +46,13 @@ export class ChatParticipant {
   @OneToMany(() => ChatMessage, (message) => message.sender)
   messages: ChatMessage[];
 
+  @Column({
+    type: 'enum',
+    enum: ChatParticipantRole,
+    default: ChatParticipantRole.USER,
+  })
+  role: ChatParticipantRole;
+
   @DeleteDateColumn()
   deletedAt: Date;
 
@@ -53,11 +62,16 @@ export class ChatParticipant {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  static fromDto(user: User, chatRoom: ChatRoom): ChatParticipant {
+  static fromDto(
+    user: User,
+    chatRoom: ChatRoom,
+    dto: CreateChatParticipantDto,
+  ): ChatParticipant {
     const participant = new ChatParticipant();
 
     participant.user = user;
     participant.chatRoom = chatRoom;
+    participant.role = dto.role;
 
     return participant;
   }
@@ -65,6 +79,7 @@ export class ChatParticipant {
   toDto(): ChatParticipantDto {
     const dto = new ChatParticipantDto();
 
+    dto.role = this.role;
     dto.id = this.user.id;
     dto.name = this.user.name;
     dto.createdAt = this.createdAt.toISOString();

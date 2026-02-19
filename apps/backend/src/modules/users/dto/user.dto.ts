@@ -1,5 +1,5 @@
-import { Role } from '@/constants/roles.constant';
 import { IsEmail, IsEnum, IsString } from 'class-validator';
+import { UserRole } from '@workspace/shared/constants/user.constant';
 
 export class UserDto {
   @IsString()
@@ -11,6 +11,6 @@ export class UserDto {
   @IsEmail()
   email: string;
 
-  @IsEnum(Role)
-  role: Role;
+  @IsEnum(UserRole)
+  role: UserRole;
 }
