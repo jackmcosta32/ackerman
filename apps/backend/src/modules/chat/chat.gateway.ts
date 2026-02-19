@@ -59,22 +59,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`Client disconnected: ${socket.id}`);
   }
 
-  @SubscribeMessage('send_message')
-  async handleMessage(
-    @MessageBody() sendChatMessageDto: SendChatMessageDto,
-    @ConnectedSocket() socket: AuthenticatedSocket,
-  ) {
-    console.log('Message received:', sendChatMessageDto);
-
-    const message = await this.chatService.sendMessageFromUser(
-      socket.data.user.id,
-      sendChatMessageDto.chatRoomId,
-      sendChatMessageDto,
-    );
-
-    this.server.to(sendChatMessageDto.chatRoomId).emit('new_message', message);
-  }
-
   @SubscribeMessage('join_room')
   async handleJoinRoom(
     @MessageBody() joinChatRoomDto: JoinChatRoomDto,
@@ -100,5 +84,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`Socket ${socket.id} left room ${leaveChatRoomDto.chatRoomId}`);
 
     await socket.leave(leaveChatRoomDto.chatRoomId);
+  }
+
+  @SubscribeMessage('send_message')
+  async handleMessage(
+    @MessageBody() sendChatMessageDto: SendChatMessageDto,
+    @ConnectedSocket() socket: AuthenticatedSocket,
+  ) {
+    console.log('Message received:', sendChatMessageDto);
+
+    const message = await this.chatService.sendMessageFromUser(
+      socket.data.user.id,
+      sendChatMessageDto.chatRoomId,
+      sendChatMessageDto,
+    );
+
+    console.log({ message, sendChatMessageDto });
+
+    this.server.to(sendChatMessageDto.chatRoomId).emit('new_message', message);
   }
 }
