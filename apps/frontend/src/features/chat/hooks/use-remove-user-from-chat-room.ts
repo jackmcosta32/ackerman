@@ -1,8 +1,9 @@
-import type { UseMutationOptions } from '@tanstack/react-query';
 import {
   removeUserFromChatRoom,
   type RemoveUserFromChatRoomParams,
 } from '@/features/chat/services/remove-user-from-chat-room.service';
+
+import type { UseMutationOptions } from '@tanstack/react-query';
 import { useAuthMutation } from '@/features/authentication/hooks/use-auth-mutation';
 
 export type { RemoveUserFromChatRoomParams };

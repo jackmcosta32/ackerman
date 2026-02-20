@@ -1,9 +1,10 @@
-import type { UseMutationOptions } from '@tanstack/react-query';
 import {
   createChatRoom,
   type CreateChatRoomParams,
   type CreateChatRoomResult,
 } from '@/features/chat/services/create-chat-room.service';
+
+import type { UseMutationOptions } from '@tanstack/react-query';
 import { useAuthMutation } from '@/features/authentication/hooks/use-auth-mutation';
 
 export type { CreateChatRoomParams, CreateChatRoomResult };

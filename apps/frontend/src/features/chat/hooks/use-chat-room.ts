@@ -1,14 +1,14 @@
+// TODO: Rename join and leave room methods to listen and unlisten to better reflect their purpose
+
 import { useCallback, useRef, useState } from 'react';
 import { socketApiClient } from '@/data/socket/clients';
 import type { ChatMessage } from '@/features/chat/models/chat.model';
 
-export const useChat = () => {
+export const useChatRoom = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const chatRoomIdRef = useRef<string | null>(null);
 
   const handleOnNewMessage = useCallback((message: ChatMessage) => {
-    console.log('New message received:', message);
-
     setMessages((previousMessages) => [...previousMessages, message]);
   }, []);
 
