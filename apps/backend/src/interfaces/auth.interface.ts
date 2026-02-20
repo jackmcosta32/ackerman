@@ -1,15 +1,15 @@
 import type { Request } from 'express';
 import type { Socket } from 'socket.io';
-import { Role } from '@/constants/roles.constant';
+import { UserRole } from '@workspace/shared/constants/user.constant';
 
 export interface AuthPayload {
   id: string;
-  role: Role;
+  role: UserRole;
 }
 
 export interface AuthenticatedRequest extends Request {
   user: AuthPayload;
-  role?: Role;
+  role?: UserRole;
 }
 
 export interface AuthenticatedSocket extends Socket {

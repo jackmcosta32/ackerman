@@ -274,6 +274,39 @@ export class ChatService {
     await this.chatParticipantRepository.save(invitedParticipant);
   }
 
+  async removeUserFromChatRoom(
+    userId: string,
+    removedUserId: string,
+    chatRoomId: string,
+  ) {
+    const chatRoom = await this.chatRoomRepository.findOneBy({
+      id: chatRoomId,
+    });
+
+    if (!chatRoom) {
+      throw new UnprocessableEntityException('Chat room not found');
+    }
+
+    const chatParticipant = await this.chatParticipantRepository.findOneBy({
+      user: { id: userId },
+      chatRoom: { id: chatRoomId },
+    });
+
+    if (chatParticipant?.role !== ChatParticipantRole.ADMIN) {
+      throw new ForbiddenException('Could not remove user from chat room');
+    }
+
+    const existingRemovedParticipant =
+      await this.chatParticipantRepository.findOneBy({
+        user: { id: removedUserId },
+        chatRoom: { id: chatRoomId },
+      });
+
+    if (!existingRemovedParticipant) return;
+
+    await this.chatParticipantRepository.softRemove(existingRemovedParticipant);
+  }
+
   async sendMessageFromUser(
     userId: string,
     chatRoomId: string,

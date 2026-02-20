@@ -33,7 +33,8 @@ export const formatValidationErrors = (errors: ValidationError[]) => {
 
   return new BadRequestException({
     error: 'Bad Request',
-    message: flattened,
+    detail: 'One or more fields contain invalid values.',
     statusCode: HttpStatus.BAD_REQUEST,
+    fieldErrors: flattened,
   });
 };

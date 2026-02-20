@@ -18,11 +18,11 @@ import {
   FeatureFlagAlreadyExistsError,
 } from './feature-flags.errors';
 
-import { Role } from '@/constants/roles.constant';
 import { AuthGuard } from '@/modules/auth/auth.guard';
 import { Roles } from '@/modules/auth/roles.decorator';
 import { RolesGuard } from '@/modules/auth/roles.guard';
 import { FeatureFlagsService } from './feature-flags.service';
+import { UserRole } from '@workspace/shared/constants/user.constant';
 import { CreateFeatureFlagDto } from './dto/create-feature-flag.dto';
 import { UpdateFeatureFlagDto } from './dto/update-feature-flag.dto';
 import { EvaluateFeatureFlagDto } from './dto/evaluate-feature-flag.dto';
@@ -32,7 +32,7 @@ import { EvaluateFeatureFlagDto } from './dto/evaluate-feature-flag.dto';
 export class FeatureFlagsController {
   constructor(private readonly featureFlagsService: FeatureFlagsService) {}
 
-  @Roles(Role.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Post()
   async create(@Body() createFeatureFlagDto: CreateFeatureFlagDto) {
     try {
@@ -64,7 +64,7 @@ export class FeatureFlagsController {
     }
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Patch(':key')
   async update(
     @Param('key') key: string,
@@ -81,7 +81,7 @@ export class FeatureFlagsController {
     }
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Post(':key/toggle')
   async toggle(@Param('key') key: string) {
     try {
@@ -95,7 +95,7 @@ export class FeatureFlagsController {
     }
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Delete(':key')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('key') key: string) {
@@ -111,7 +111,7 @@ export class FeatureFlagsController {
     }
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Post(':key/evaluate')
   async evaluate(
     @Param('key') key: string,

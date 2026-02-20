@@ -1,11 +1,11 @@
-import { IsBoolean, IsOptional, IsString, Length } from 'class-validator';
+import { Length, IsString, IsBoolean, IsOptional } from 'class-validator';
 
 export class CreateChatRoomDto {
   @IsString()
   @Length(1, 100)
   name: string;
 
-  @IsBoolean()
   @IsOptional()
-  private: boolean;
+  @IsBoolean()
+  private?: boolean;
 }
