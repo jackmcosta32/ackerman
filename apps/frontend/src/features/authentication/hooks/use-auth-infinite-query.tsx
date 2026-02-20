@@ -1,22 +1,23 @@
 import {
-  useQuery,
+  useInfiniteQuery,
   type QueryKey,
   type DefaultError,
   type QueryFunction,
-  type UseQueryOptions,
   type QueryFunctionContext,
+  type UseInfiniteQueryOptions,
 } from '@tanstack/react-query';
 
 import { HttpError } from '@/data/http/http-error';
 import { HTTP_STATUS } from '@/data/http/http-protocol';
 import { refreshSessionTokens } from '@/features/authentication/services/refresh-session-tokens.service';
 
-const handleQueryFn = async <
+const handleInfiniteQueryFn = async <
   TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
+  TPageParam = unknown,
 >(
-  queryFn: QueryFunction<TQueryFnData, TQueryKey>,
-  context: QueryFunctionContext<TQueryKey>,
+  queryFn: QueryFunction<TQueryFnData, TQueryKey, TPageParam>,
+  context: QueryFunctionContext<TQueryKey, TPageParam>,
 ): Promise<TQueryFnData> => {
   try {
     return await queryFn(context);
@@ -33,16 +34,27 @@ const handleQueryFn = async <
   }
 };
 
-export const useAuthQuery = <
+export const useAuthInfiniteQuery = <
   TQueryFnData,
   TError = DefaultError,
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
+  TPageParam = unknown,
 >(
-  options: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
+  options: UseInfiniteQueryOptions<
+    TQueryFnData,
+    TError,
+    TData,
+    TQueryKey,
+    TPageParam
+  >,
 ) => {
-  return useQuery<TQueryFnData, TError, TData, TQueryKey>({
+  return useInfiniteQuery<TQueryFnData, TError, TData, TQueryKey, TPageParam>({
     ...options,
-    queryFn: (ctx) => handleQueryFn(options.queryFn as never, ctx),
+    queryFn: (ctx) =>
+      handleInfiniteQueryFn<TQueryFnData, TQueryKey, TPageParam>(
+        options.queryFn as never,
+        ctx,
+      ),
   });
 };

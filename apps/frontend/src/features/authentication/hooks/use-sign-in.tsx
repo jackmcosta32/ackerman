@@ -1,18 +1,9 @@
-import { httpApiClient } from '@/data/http/clients';
+import {
+  signIn,
+  type SignInParams,
+} from '@/features/authentication/services/sign-in.service';
+
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
-
-export interface SignInParams {
-  email: string;
-  password: string;
-}
-
-const signIn = async (params: SignInParams) => {
-  await httpApiClient.request('/auth/sign-in', {
-    method: 'POST',
-    credentials: 'include',
-    body: JSON.stringify(params),
-  });
-};
 
 export const SIGN_IN_MUTATION_KEY = ['signIn'];
 
