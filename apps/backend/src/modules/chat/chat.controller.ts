@@ -13,7 +13,7 @@ import { ChatService } from './chat.service';
 import { AuthGuard } from '@/modules/auth/auth.guard';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
 import { FindAllChatRoomsDto } from './dto/find-all-chat-rooms.dto';
-import type { AuthenticatedRequest } from '@/interfaces/auth.interface';
+import type { AuthenticatedRequest } from '@/modules/auth/interfaces/auth.interface';
 
 @Controller('chat')
 export class ChatController {

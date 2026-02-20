@@ -16,7 +16,7 @@ import { AuthService } from '@/modules/auth/auth.service';
 import { JoinChatRoomDto } from './dto/join-chat-room.dto';
 import { LeaveChatRoomDto } from './dto/leave-chat-room.dto';
 import { SendChatMessageDto } from './dto/send-chat-message.dto';
-import type { AuthenticatedSocket } from '@/interfaces/auth.interface';
+import type { AuthenticatedSocket } from '@/modules/auth/interfaces/auth.interface';
 import { extractTokenFromWebSocket } from '@/modules/auth/strategies/jwt/jwt.utils';
 
 @UseGuards(AuthGuard)

@@ -1,7 +1,7 @@
 import type {
   AuthenticatedSocket,
   AuthenticatedRequest,
-} from '@/interfaces/auth.interface';
+} from '@/modules/auth/interfaces/auth.interface';
 
 import {
   extractTokenFromWebSocket,

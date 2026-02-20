@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
-import { formatValidationErrors } from '@/utils/format-validation-errors';
+import { formatValidationErrors } from '@/modules/shared/utils/validation/format-validation-errors';
 
 const setupApiDocumentation = (app: INestApplication) => {
   const config = new DocumentBuilder()

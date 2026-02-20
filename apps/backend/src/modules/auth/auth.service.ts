@@ -12,7 +12,7 @@ import { ConfigService } from '@nestjs/config';
 import { User } from '@/modules/users/entities/user.entity';
 import type { WithQueryRunner } from '@/types/typeorm.types';
 import { UsersService } from '@/modules/users/users.service';
-import type { AuthPayload } from '@/interfaces/auth.interface';
+import type { AuthPayload } from '@/modules/auth/interfaces/auth.interface';
 import { UserNotFoundError } from '@/modules/users/users.errors';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { DataSource, Repository, type SaveOptions } from 'typeorm';
