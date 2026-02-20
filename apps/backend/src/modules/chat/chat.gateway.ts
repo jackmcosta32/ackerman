@@ -13,11 +13,12 @@ import { UseGuards } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { AuthGuard } from '@/modules/auth/auth.guard';
 import { AuthService } from '@/modules/auth/auth.service';
-import { JoinChatRoomDto } from './dto/join-chat-room.dto';
-import { LeaveChatRoomDto } from './dto/leave-chat-room.dto';
 import { SendChatMessageDto } from './dto/send-chat-message.dto';
+import { ConnectToChatRoomDto } from './dto/connect-to-chat-room.dto';
+import { CHAT_EVENT } from '@workspace/shared/constants/chat.constant';
 import type { AuthenticatedSocket } from '@/modules/auth/interfaces/auth.interface';
 import { extractTokenFromWebSocket } from '@/modules/auth/strategies/jwt/jwt.utils';
+import { DisconnectFromChatRoomDto } from './dto/disconnect-from-chat-room.dto';
 
 @UseGuards(AuthGuard)
 @WebSocketGateway({
@@ -59,34 +60,36 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`Client disconnected: ${socket.id}`);
   }
 
-  @SubscribeMessage('join_room')
-  async handleJoinRoom(
-    @MessageBody() joinChatRoomDto: JoinChatRoomDto,
+  @SubscribeMessage(CHAT_EVENT.CONNECT_TO_ROOM)
+  async handleConnectToRoom(
+    @MessageBody() connectToChatRoomDto: ConnectToChatRoomDto,
     @ConnectedSocket() socket: AuthenticatedSocket,
   ) {
     console.log(
-      `Socket ${socket.id} joined room ${joinChatRoomDto.chatRoomId}`,
+      `Socket ${socket.id} joined room ${connectToChatRoomDto.chatRoomId}`,
     );
 
     await this.chatService.joinChatRoom(
       socket.data.user.id,
-      joinChatRoomDto.chatRoomId,
+      connectToChatRoomDto.chatRoomId,
     );
 
-    await socket.join(joinChatRoomDto.chatRoomId);
+    await socket.join(connectToChatRoomDto.chatRoomId);
   }
 
-  @SubscribeMessage('leave_room')
-  async handleLeaveRoom(
-    @MessageBody() leaveChatRoomDto: LeaveChatRoomDto,
+  @SubscribeMessage(CHAT_EVENT.DISCONNECT_FROM_ROOM)
+  async handleDisconnectFromRoom(
+    @MessageBody() disconnectFromChatRoomDto: DisconnectFromChatRoomDto,
     @ConnectedSocket() socket: AuthenticatedSocket,
   ) {
-    console.log(`Socket ${socket.id} left room ${leaveChatRoomDto.chatRoomId}`);
+    console.log(
+      `Socket ${socket.id} left room ${disconnectFromChatRoomDto.chatRoomId}`,
+    );
 
-    await socket.leave(leaveChatRoomDto.chatRoomId);
+    await socket.leave(disconnectFromChatRoomDto.chatRoomId);
   }
 
-  @SubscribeMessage('send_message')
+  @SubscribeMessage(CHAT_EVENT.SEND_MESSAGE)
   async handleMessage(
     @MessageBody() sendChatMessageDto: SendChatMessageDto,
     @ConnectedSocket() socket: AuthenticatedSocket,
@@ -99,8 +102,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       sendChatMessageDto,
     );
 
-    console.log({ message, sendChatMessageDto });
-
-    this.server.to(sendChatMessageDto.chatRoomId).emit('new_message', message);
+    this.server
+      .to(sendChatMessageDto.chatRoomId)
+      .emit(CHAT_EVENT.NEW_MESSAGE, message);
   }
 }

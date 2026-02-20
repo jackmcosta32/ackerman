@@ -196,7 +196,7 @@ export class ChatService {
         chatRoom: { id: chatRoomId },
       });
 
-    if (existingChatParticipant) return;
+    if (existingChatParticipant || chatRoom.private) return;
 
     const user = await this.userService.findOneById(userId);
 
