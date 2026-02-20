@@ -1,10 +1,9 @@
 import { httpApiClient } from '@/data/http/clients';
-import type { QueryFunctionContext } from '@tanstack/react-query';
 
-export const refreshSessionTokens = async (context: QueryFunctionContext) => {
+export const refreshSessionTokens = async (options?: RequestInit) => {
   const response = await httpApiClient.request('/auth/refresh', {
     credentials: 'include',
-    signal: context.signal,
+    ...options,
   });
 
   return response.json();
